@@ -16,6 +16,9 @@ int red_cmd(char *cmd) {
 	case 's':
 		cmd_seek(cmd+1);
 		break;
+	case 'b':
+		cmd_bsize(cmd+1);
+		break;
 	case 'x':
 		cmd_hexdump(cmd+1);
 		break;
@@ -64,7 +67,7 @@ int red_open(char *file) {
 
 int main(int argc, char **argv) {
         char ch;
-        while(argc-->0)
+        while(--argc>0)
 		red_open(argv[argc]); /* open myself :) */
         return 0;
 }

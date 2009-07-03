@@ -1,0 +1,25 @@
+RED stands for the raw editor
+=============================
+
+red aims to be a minimalistic reimplementation of the radare shell
+without much complexity and relaying all the extensibility to
+external applications trying to keep the source as small as possible.
+
+? is for help
+x hexdump
+X dword dump   (32bit hex values?)
+o octdump
+w "string\x00"  write string
+w 023839400     write hexpairs
+b 30            set block size
+s addr          seek address
+o open          allow to open file number # or named
+                no arguments show all files in argv
+
+Missing commands:
+=================
+peek/poke from files?
+IO with pipes
+go next/previous/file  - o #
+
+--pancake

@@ -3,13 +3,15 @@
 #define ull unsigned long long 
 
 static int fd = 0;
-static char *file = 0;
-ull oseek, seek = 0LL;
-int bsize = 512;
+static int verbose = 1;
+//static char *file = 0;
+static char *script = 0;
+static ull oseek, seek = 0LL;
+static int bsize = 512;
 
 #include "red.h"
 
-int red_cmd(char *cmd) {
+static int red_cmd(char *cmd) {
 	switch(*cmd) {
 	case 'q':
 		return 0;
@@ -34,11 +36,13 @@ int red_cmd(char *cmd) {
 	return 1;
 }
 
-int red_prompt() {
+static int red_prompt() {
 	char *at, line[4096];
 
-	printf("[0x%08llx]> ", seek);
-	fflush(stdout);
+	if (verbose) {
+		printf("[0x%08llx]> ", seek);
+		fflush(stdout);
+	}
 	fgets(line, 4095, stdin);
 	if (feof(stdin))
 		return 0;
@@ -52,22 +56,62 @@ int red_prompt() {
 	return red_cmd(skipspaces(line));
 }
 
-int red_open(char *file) {
-	fd = open(file, O_RDWR);
+static char *red_interpret(char *file) {
+	char buf[1024];
+	FILE *fh = fopen(file, "r");
+	if (fh == NULL) {
+		fprintf(stderr, "Cannot open script file '%s'\n", file);
+		return file;
+	}
+	for(;;) {
+		fgets(buf, 1023, fh);
+		if (feof(fh))
+			break;
+		red_cmd(buf);
+	}
+	fclose(fh);
+	return NULL;
+}
+
+static void red_open(char *file) {
+	fd = open(file, O_RDWR|O_CREAT, 0644);
 	if (fd == -1)
 		fd = open(file, O_RDONLY);
-	if (fd == -1) {
-		fprintf(stderr, "Cannot open '%s'.\n", file);
-		return 1;
-	}
-	while(red_prompt())
-		seek = oseek;
-	close(fd);
+	if (fd != -1) {
+		if (script)
+			script = red_interpret(script);
+		while(red_prompt())
+			seek = oseek;
+		close(fd);
+	} else fprintf(stderr, "Cannot open '%s'.\n", file);
+}
+
+static int red_help() {
+	puts("red [-vhv [-i script] [file] [..]");
+	return 0;
 }
 
 int main(int argc, char **argv) {
-        char ch;
-        while(--argc>0)
-		red_open(argv[argc]); /* open myself :) */
+	int i;
+	if (argc==1)
+		return red_help();
+	for(i=1;i<argc;i++) {
+		if (argv[i][0]!='-')
+			red_open(argv[i]);
+		else
+		switch(argv[i][1]) {
+		case 'i':
+			script = argv[++i];
+			break;
+		case 's':
+			verbose = 0;
+			break;
+		case 'v':
+			puts("red "VERSION);
+			return 0;
+		case 'h':
+			return red_help();
+		}
+	}
         return 0;
 }

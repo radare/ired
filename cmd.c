@@ -1,7 +1,8 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
+#define HEXWIDTH 16
 void cmd_hexdump(char *arg) {
-	int i, j, inc = 16;
+	int i, j;
 	unsigned int len = bsize;
 	unsigned char *buf;
 
@@ -10,17 +11,17 @@ void cmd_hexdump(char *arg) {
 		if (len <1)
 			len = bsize;
 	} 
-	lseek(fd, seek, SEEK_SET);
 	buf = malloc(len);
 	if (buf == NULL) {
 		fprintf(stderr, "Cannot malloc %d bytes.\n", len);
 		return;
 	}
-	len = read(fd, buf, len);
+	io_seek(seek, SEEK_SET);
+	len = io_read(buf, len);
 
-	for(i=0;i<len;i+=inc) {
+	for(i=0;i<len;i+=HEXWIDTH) {
 		printf("0x%08llx ", seek+i);
-		for(j=i;j<i+inc;j++) {
+		for(j=i;j<i+HEXWIDTH;j++) {
 			if (j>=len) {
 				if (j%2) printf("   ");
 				else printf("  ");
@@ -29,7 +30,7 @@ void cmd_hexdump(char *arg) {
 			printf("%02x", buf[j]);
 			if (j%2) printf(" ");
 		}
-		for(j=i;j<i+inc;j++) {
+		for(j=i;j<i+HEXWIDTH;j++) {
 			if (j >= len) printf(" ");
 			else printf("%c", isprint(buf[j])?buf[j]:'.');
 		}
@@ -39,28 +40,33 @@ void cmd_hexdump(char *arg) {
 }
 
 void cmd_bsize(char *arg) {
-	bsize = (int)str2ull(arg);
-	if (bsize<1)
-		bsize = 1;
+	if (*arg) {
+		bsize = (int)str2ull(arg);
+		if (bsize<1)
+			bsize = 1;
+	} else printf("%d\n", bsize);
 }
 
 void cmd_seek(char *arg) {
-	oseek = seek = str2ull(arg);
+	if (*arg==0)
+		printf("%lld\n", seek);
+	else if (*arg=='+')
+		oseek = seek = seek+str2ull(arg+1);
+	else if (*arg=='-')
+		oseek = seek = seek-str2ull(arg+1);
+	else oseek = seek = str2ull(arg);
 }
 
 void cmd_write(char *arg) {
-	int len;
+	unsigned int len;
 	arg = skipspaces(arg);
 	if (*arg=='"') {
 		arg++;
 		len = strlen(arg)-1;
 		arg[len]='\0';
-	} else {
-		len = hexstr2raw(arg);
-		printf("write hexpair ('%d')\n", len);
-	}
-	lseek(fd, seek, SEEK_SET);
-	write(fd, arg, len);
+	} else len = hexstr2raw(arg);
+	io_seek(seek, SEEK_SET);
+	io_write(arg, len);
 }
 
 void cmd_help(char *arg) {

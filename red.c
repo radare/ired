@@ -1,13 +1,11 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
 #define ull unsigned long long 
-
-static int fd = 0;
 static int verbose = 1;
 //static char *file = 0;
 static char *script = 0;
 static ull oseek, seek = 0LL;
-static int bsize = 512;
+static int bsize = 256;
 
 #include "red.h"
 
@@ -31,7 +29,7 @@ static int red_cmd(char *cmd) {
 		cmd_help(cmd+1);
 		break;
 	default:
-		fprintf(stderr, "? %s", cmd);
+		fprintf(stderr, "? %s\n", cmd);
 	}
 	return 1;
 }
@@ -74,10 +72,7 @@ static char *red_interpret(char *file) {
 }
 
 static void red_open(char *file) {
-	fd = open(file, O_RDWR|O_CREAT, 0644);
-	if (fd == -1)
-		fd = open(file, O_RDONLY);
-	if (fd != -1) {
+	if (io_open(file) != -1) {
 		if (script)
 			script = red_interpret(script);
 		while(red_prompt())
@@ -107,7 +102,7 @@ int main(int argc, char **argv) {
 			verbose = 0;
 			break;
 		case 'v':
-			puts("red "VERSION);
+			puts("red "VERSION" 2009");
 			return 0;
 		case 'h':
 			return red_help();

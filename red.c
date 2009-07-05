@@ -22,8 +22,14 @@ static int red_cmd(char *cmd) {
 	case 'x':
 		cmd_hexdump(cmd+1);
 		break;
+	case 'X':
+		cmd_bytedump(cmd+1);
+		break;
 	case 'w':
 		cmd_write(cmd+1);
+		break;
+	case '!':
+		cmd_system(cmd+1);
 		break;
 	case '?':
 		cmd_help(cmd+1);

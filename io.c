@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 static int fd = -1;
 
@@ -32,4 +33,9 @@ int io_seek(ull addr, int type) {
 static inline
 int io_close() {
 	return close(fd);
+}
+
+static inline
+int io_system(char *cmd) {
+	return system(cmd);
 }

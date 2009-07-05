@@ -2,8 +2,7 @@
 
 #define HEXWIDTH 16
 void cmd_hexdump(char *arg) {
-	int i, j;
-	unsigned int len = bsize;
+	unsigned int i, j, len = bsize;
 	unsigned char *buf;
 
 	if (*arg) {
@@ -39,21 +38,45 @@ void cmd_hexdump(char *arg) {
 	free(buf);
 }
 
-void cmd_bsize(char *arg) {
+void cmd_bytedump(char *arg) {
+	unsigned int i, len = bsize;
+	unsigned char *buf;
 	if (*arg) {
-		bsize = (int)str2ull(arg);
-		if (bsize<1)
-			bsize = 1;
-	} else printf("%d\n", bsize);
+		len = (int)str2ull(arg);
+		if (len <1)
+			len = bsize;
+	}
+	buf = malloc(len);
+	if (buf == NULL) {
+		fprintf(stderr, "Cannot malloc %d bytes.\n", len);
+		return;
+	}
+	io_seek(seek, SEEK_SET);
+	len = io_read(buf, len);
+	for(i=0;i<len;i++)
+		printf("%02x", buf[i]);
+	printf("\n");
+}
+
+void cmd_bsize(char *arg) {
+	if (!*arg)
+		printf("%d\n", bsize);
+	else if (*arg=='+')
+		bsize+=str2ull(arg+1);
+	else if (*arg=='-')
+		bsize-=str2ull(arg+1);
+	else bsize = str2ull(arg);
+	if (bsize<1)
+		bsize = 1;
 }
 
 void cmd_seek(char *arg) {
-	if (*arg==0)
+	if (!*arg)
 		printf("%lld\n", seek);
 	else if (*arg=='+')
-		oseek = seek = seek+str2ull(arg+1);
+		oseek = seek+=str2ull(arg+1);
 	else if (*arg=='-')
-		oseek = seek = seek-str2ull(arg+1);
+		oseek = seek-=str2ull(arg+1);
 	else oseek = seek = str2ull(arg);
 }
 
@@ -73,5 +96,15 @@ void cmd_help(char *arg) {
 	if (*arg) {
 		ull ret = str2ull(arg);
 		printf("0x%llx %lld 0%llo\n", ret, ret, ret);
-	} else fprintf(stderr, "Check source for help.\n");
+	} else printf(
+	"s[+-addr]    seek to relative or absolute address\n"
+	"b[+-size]    change block size\n"
+	"w hex|\"str\"  change block size\n"
+	"x[size]    hexdump\n"
+	"!cmd       run shell command\n"
+	"q          quit\n");
+}
+
+void cmd_system(char *arg) {
+	io_system(arg);
 }

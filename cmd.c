@@ -58,6 +58,31 @@ void cmd_bytedump(char *arg) {
 	printf("\n");
 }
 
+void cmd_search(char *arg) {
+	unsigned char *buf;
+	unsigned int i, len, hit=0;
+
+	arg = skipspaces(arg);
+	if (*arg=='"') {
+		arg++;
+		len = strlen(arg)-1;
+		arg[len]='\0';
+	} else len = hexstr2raw(arg);
+
+	buf = malloc(bsize);
+	io_seek(seek, SEEK_SET);
+	while(io_read(buf, bsize)>0) {
+		for(i=0;i<bsize;i++) {
+			if (arg[hit++]!=buf[i])
+				hit = 0;
+			else if (hit == len)
+				printf("0x%llx\n", seek+i-len+1);
+		}
+		seek+=bsize;
+	}
+	free(buf);
+}
+
 void cmd_bsize(char *arg) {
 	if (!*arg)
 		printf("%d\n", bsize);
@@ -97,14 +122,38 @@ void cmd_help(char *arg) {
 		ull ret = str2ull(arg);
 		printf("0x%llx %lld 0%llo\n", ret, ret, ret);
 	} else printf(
-	"s[+-addr]    seek to relative or absolute address\n"
-	"b[+-size]    change block size\n"
-	"w hex|\"str\"  change block size\n"
-	"x[size]    hexdump\n"
-	"!cmd       run shell command\n"
-	"q          quit\n");
+	"s[+-addr]     seek to relative or absolute address\n"
+	"b[+-size]     change block size\n"
+	"w[hex|\"str\"]  change block size\n"
+	"/[hex|\"str\"]  search hexpair or string\n"
+	"x[size]       hexdump\n"
+	"!cmd          run shell command\n"
+	"q             quit\n");
 }
 
 void cmd_system(char *arg) {
+	FILE *f;
+	char *buf = malloc(bsize+128);
+	int len;
+	if (strstr(arg, "BLOCK")) {
+		setenv("BLOCK", ".curblk", 1);
+		f = fopen(".curblk", "w");
+		io_seek(seek, SEEK_SET);
+		len = io_read(buf, bsize);
+		fwrite(buf, len, 1, f);
+		fclose(f);
+	}
+	if (strstr(arg, "FILE"))
+		setenv("FILE", "/bin/ls", 1); // XXX
+	if (strstr(arg, "OFFSET")) {
+		sprintf(buf, "%lld", seek);
+		setenv("OFFSET", buf, 1); // XXX
+	}
+	if (strstr(arg, "XOFFSET")) {
+		sprintf(buf, "0x%llx", seek);
+		setenv("XOFFSET", buf, 1); // XXX
+	}
 	io_system(arg);
+	unlink(".curblk");
+	free(buf);
 }

@@ -19,6 +19,9 @@ static int red_cmd(char *cmd) {
 	case 'b':
 		cmd_bsize(cmd+1);
 		break;
+	case '/':
+		cmd_search(cmd+1);
+		break;
 	case 'x':
 		cmd_hexdump(cmd+1);
 		break;
@@ -88,7 +91,7 @@ static void red_open(char *file) {
 }
 
 static int red_help() {
-	puts("red [-vhv [-i script] [file] [..]");
+	puts("red [-nhv [-i script] [file] [..]");
 	return 0;
 }
 
@@ -104,7 +107,7 @@ int main(int argc, char **argv) {
 		case 'i':
 			script = argv[++i];
 			break;
-		case 's':
+		case 'n':
 			verbose = 0;
 			break;
 		case 'v':

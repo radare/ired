@@ -20,10 +20,12 @@ peek/poke from files? using the '<' and '>' commands
 TODO
 ====
 filesize support
-flags (implement basic 'f' command to flag) usable from seek
-IO with pipes
 go next/previous/file  - o #
 endian support
 dump in hex like in gdb's x/x
+
+flags (implement basic 'f' command to flag) usable from seek
+  - better to use flags defined on a file, and use grep and
+    so on to retrieve them?
 
 --pancake

@@ -6,8 +6,8 @@ inline char *skipspaces(char *arg) {
 	return arg;
 }
 
-ull str2ull(char *str) {
-	ull ret = 0LL;
+ut64 str2ut64(char *str) {
+	ut64 ret = 0LL;
 	str = skipspaces(str);
 	if (str[0]=='0'&&str[1]=='x')
 		sscanf(str, "0x%llx", &ret);
@@ -16,20 +16,20 @@ ull str2ull(char *str) {
 }
 
 /* TODO : remove and use sscanf? */
-int hex2byte(uc8 *val, uc8 c) {
-	if ('0' <= c && c <= '9')      *val = (uc8)(*val) * 16 + ( c - '0');
-	else if (c >= 'A' && c <= 'F') *val = (uc8)(*val) * 16 + ( c - 'A' + 10);
-	else if (c >= 'a' && c <= 'f') *val = (uc8)(*val) * 16 + ( c - 'a' + 10);
+int hex2byte(ut8 *val, ut8 c) {
+	if ('0' <= c && c <= '9')      *val = (ut8)(*val) * 16 + ( c - '0');
+	else if (c >= 'A' && c <= 'F') *val = (ut8)(*val) * 16 + ( c - 'A' + 10);
+	else if (c >= 'a' && c <= 'f') *val = (ut8)(*val) * 16 + ( c - 'a' + 10);
 	else return 1;
 	return 0;
 }
 
 /* TODO : cleanup */
 int hexstr2raw(char *arg) {
-	uc8 *ptr, c, d;
+	ut8 *ptr, c, d;
 	unsigned int j, len;
 	len = c = d = j = 0;
-	for (ptr=(uc8 *)arg;*ptr;ptr++) {
+	for (ptr=(ut8 *)arg;*ptr;ptr++) {
 		d = c;
 		if (hex2byte(&c, *ptr))
 			return -1;
@@ -49,7 +49,7 @@ void *getcurblk(char *arg) {
 	void *buf;
 	int len = bsize;
 	if (*arg) {
-		len = (int)str2ull(arg);
+		len = (int)str2ut64(arg);
 		if (len <1)
 			len = bsize;
 	}

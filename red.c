@@ -1,10 +1,11 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
-#define ull unsigned long long 
-#define uc8 unsigned char
+#define ut64 unsigned long long 
+#define ut8 unsigned char
+
 static int verbose = 1;
 static char *script = 0;
-static ull oseek, seek = 0LL;
+static ut64 oseek, seek = 0LL;
 static int bsize = 256;
 static char *red_interpret(char *file); // XXX
 
@@ -43,7 +44,7 @@ static int red_prompt() {
 	oseek = seek;
 	if (at) {
 		*at='\0';
-		seek = str2ull(at+1);
+		seek = str2ut64(at+1);
 	}
 	return red_cmd(skipspaces(line));
 }

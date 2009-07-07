@@ -61,10 +61,10 @@ void cmd_bsize(char *arg) {
 	if (!*arg)
 		printf("%d\n", bsize);
 	else if (*arg=='+')
-		bsize+=str2ull(arg+1);
+		bsize+=str2ut64(arg+1);
 	else if (*arg=='-')
-		bsize-=str2ull(arg+1);
-	else bsize = str2ull(arg);
+		bsize-=str2ut64(arg+1);
+	else bsize = str2ut64(arg);
 	if (bsize<1)
 		bsize = 1;
 }
@@ -73,10 +73,10 @@ void cmd_seek(char *arg) {
 	if (!*arg)
 		printf("%lld\n", seek);
 	else if (*arg=='+')
-		oseek = seek+=str2ull(arg+1);
+		oseek = seek+=str2ut64(arg+1);
 	else if (*arg=='-')
-		oseek = seek-=str2ull(arg+1);
-	else oseek = seek = str2ull(arg);
+		oseek = seek-=str2ut64(arg+1);
+	else oseek = seek = str2ut64(arg);
 }
 
 void cmd_dump(char *file) {
@@ -115,7 +115,7 @@ void cmd_write(char *arg) {
 
 void cmd_help(char *arg) {
 	if (*arg) {
-		ull ret = str2ull(arg);
+		ut64 ret = str2ut64(arg);
 		printf("0x%llx %lld 0%llo\n", ret, ret, ret);
 	} else printf(
 	"s[+-addr]     seek to relative or absolute address\n"

@@ -3,34 +3,21 @@
 #define HEXWIDTH 16
 void cmd_hexdump(char *arg) {
 	unsigned int i, j, len = bsize;
-	unsigned char *buf;
-
-	if (*arg) {
-		len = (int)str2ull(arg);
-		if (len <1)
-			len = bsize;
-	} 
-	buf = malloc(len);
-	if (buf == NULL) {
-		fprintf(stderr, "Cannot malloc %d bytes.\n", len);
+	unsigned char *buf = getcurblk(arg);
+	if (!buf)
 		return;
-	}
-	io_seek(seek, SEEK_SET);
-	len = io_read(buf, len);
-
 	for(i=0;i<len;i+=HEXWIDTH) {
 		printf("0x%08llx ", seek+i);
 		for(j=i;j<i+HEXWIDTH;j++) {
 			if (j>=len) {
-				if (j%2) printf("   ");
-				else printf("  ");
+				printf(j%2?"   ":"  ");
 				continue;
 			}
 			printf("%02x", buf[j]);
 			if (j%2) printf(" ");
 		}
 		for(j=i;j<i+HEXWIDTH;j++) {
-			if (j >= len) printf(" ");
+			if (j>=len) printf(" ");
 			else printf("%c", isprint(buf[j])?buf[j]:'.');
 		}
 		printf("\n");
@@ -40,19 +27,9 @@ void cmd_hexdump(char *arg) {
 
 void cmd_bytedump(char *arg) {
 	unsigned int i, len = bsize;
-	unsigned char *buf;
-	if (*arg) {
-		len = (int)str2ull(arg);
-		if (len <1)
-			len = bsize;
-	}
-	buf = malloc(len);
-	if (buf == NULL) {
-		fprintf(stderr, "Cannot malloc %d bytes.\n", len);
+	unsigned char *buf = getcurblk(arg);
+	if (!buf)
 		return;
-	}
-	io_seek(seek, SEEK_SET);
-	len = io_read(buf, len);
 	for(i=0;i<len;i++)
 		printf("%02x", buf[i]);
 	printf("\n");
@@ -61,17 +38,14 @@ void cmd_bytedump(char *arg) {
 void cmd_search(char *arg) {
 	unsigned char *buf;
 	unsigned int i, len, hit=0;
-
 	arg = skipspaces(arg);
 	if (*arg=='"') {
 		arg++;
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-
-	buf = malloc(bsize);
-	io_seek(seek, SEEK_SET);
-	while(io_read(buf, bsize)>0) {
+	buf = getcurblk("");
+	do {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i])
 				hit = 0;
@@ -79,7 +53,7 @@ void cmd_search(char *arg) {
 				printf("0x%llx\n", seek+i-len+1);
 		}
 		seek+=bsize;
-	}
+	} while(io_read(buf, bsize)>0);
 	free(buf);
 }
 
@@ -105,6 +79,28 @@ void cmd_seek(char *arg) {
 	else oseek = seek = str2ull(arg);
 }
 
+void cmd_dump(char *file) {
+	void *buf = getcurblk("");
+	FILE *fd = fopen(file, "wb");
+	fwrite(buf, bsize, 1, fd);
+	fclose(fd);
+}
+
+void cmd_load(char *file) {
+	FILE *fd = fopen(file, "rb");
+	int len = bsize;
+	void *buf;
+	if (!fd)
+		return;
+	buf = malloc(bsize);
+	if (!buf)
+		return;
+	len = fread(buf, 1, len, fd);
+	io_write(buf, len);
+	fclose(fd);
+	free(buf);
+}
+
 void cmd_write(char *arg) {
 	unsigned int len;
 	arg = skipspaces(arg);
@@ -127,14 +123,17 @@ void cmd_help(char *arg) {
 	"w[hex|\"str\"]  change block size\n"
 	"/[hex|\"str\"]  search hexpair or string\n"
 	"x[size]       hexdump\n"
+	".[file]       interpret file\n"
+	"<[file]       load file in current seek\n"
+	">[file]       dump current block to file\n"
 	"!cmd          run shell command\n"
 	"q             quit\n");
 }
 
 void cmd_system(char *arg) {
 	FILE *f;
-	char *buf = malloc(bsize+128);
 	int len;
+	char *buf = malloc(bsize+128);
 	if (strstr(arg, "BLOCK")) {
 		setenv("BLOCK", ".curblk", 1);
 		f = fopen(".curblk", "w");

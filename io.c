@@ -1,3 +1,5 @@
+/* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
+
 #define _FILE_OFFSET_BITS 64
 #define _GNU_SOURCE
 

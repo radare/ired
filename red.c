@@ -2,10 +2,10 @@
 
 #define ull unsigned long long 
 static int verbose = 1;
-//static char *file = 0;
 static char *script = 0;
 static ull oseek, seek = 0LL;
 static int bsize = 256;
+static char *red_interpret(char *file); // XXX
 
 #include "red.h"
 
@@ -13,6 +13,15 @@ static int red_cmd(char *cmd) {
 	switch(*cmd) {
 	case 'q':
 		return 0;
+	case '>':
+		cmd_dump(cmd+1);
+		break;
+	case '<':
+		cmd_load(cmd+1);
+		break;
+	case '.':
+		red_interpret(skipspaces(cmd+1));
+		break;
 	case 's':
 		cmd_seek(cmd+1);
 		break;
@@ -45,7 +54,6 @@ static int red_cmd(char *cmd) {
 
 static int red_prompt() {
 	char *at, line[4096];
-
 	if (verbose) {
 		printf("[0x%08llx]> ", seek);
 		fflush(stdout);
@@ -55,11 +63,11 @@ static int red_prompt() {
 		return 0;
 	line[strlen(line)-1]='\0';
 	at = strchr(line, '@');
+	oseek = seek;
 	if (at) {
 		*at='\0';
-		oseek = seek;
 		seek = str2ull(at+1);
-	} else oseek = seek;
+	}
 	return red_cmd(skipspaces(line));
 }
 
@@ -91,7 +99,7 @@ static void red_open(char *file) {
 }
 
 static int red_help() {
-	puts("red [-nhv [-i script] [file] [..]");
+	puts("red [-nhv] [-i script] [file] [..]");
 	return 0;
 }
 

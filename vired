@@ -19,11 +19,9 @@ getstr() {
 
 while : ; do
   echo "!clear"
-  echo "!echo $XOFFSET $FILE"
   case $P in
-  'd') 
-   echo '!echo X | red -s $BLOCK | rasm2 -o $OFFSET -d -' ;;
-  *) echo x ;;
+  'd') echo '!echo X | red -s $BLOCK | rasm2 -o $OFFSET -d -' ;;
+  *)   echo x ;;
   esac
   read -n1 A
   case $A in
@@ -32,10 +30,10 @@ while : ; do
   'h') echo "s-1" ;;
   'l') echo "s+1" ;;
   'q') stty $ttyset; exit ;;
-  'b') printf 'b '>/dev/stderr; echo b `getstr` ;;
-  'w') printf 'w '>/dev/stderr; echo w `getstr` ;;
-  's') printf 's '>/dev/stderr; echo s `getstr` ;;
-  ':') printf ': '>/dev/stderr; echo `getstr`; read A ;;
+  'b') printf 'b '>/dev/tty; echo b `getstr` ;;
+  'w') printf 'w '>/dev/tty; echo w `getstr` ;;
+  's') printf 's '>/dev/tty; echo s `getstr` ;;
+  ':') printf ': '>/dev/tty; echo `getstr`; read A ;;
   '?') echo '?'; read A ;;
   '+') echo "b+1" ;;
   '-') echo "b-1" ;;

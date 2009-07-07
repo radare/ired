@@ -15,11 +15,15 @@ b 30            set block size
 s addr          seek address
 o open          allow to open file number # or named
                 no arguments show all files in argv
+peek/poke from files? using the '<' and '>' commands
 
-Missing commands:
-=================
-peek/poke from files?
+TODO
+====
+filesize support
+flags (implement basic 'f' command to flag) usable from seek
 IO with pipes
 go next/previous/file  - o #
+endian support
+dump in hex like in gdb's x/x
 
 --pancake

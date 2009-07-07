@@ -23,7 +23,7 @@ while : ; do
   'd') echo '!echo X | red -s $BLOCK | rasm2 -o $OFFSET -d -' ;;
   *)   echo x ;;
   esac
-  read -n1 A
+  A=`dd if=/dev/tty count=1 bs=1 2>/dev/null`
   case $A in
   'j') echo "s+16" ;;
   'k') echo "s-16" ;;

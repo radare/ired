@@ -16,20 +16,20 @@ ull str2ull(char *str) {
 }
 
 /* TODO : remove and use sscanf? */
-int hex2byte(unsigned char *val, unsigned char c) {
-	if ('0' <= c && c <= '9')      *val = (unsigned char)(*val) * 16 + ( c - '0');
-	else if (c >= 'A' && c <= 'F') *val = (unsigned char)(*val) * 16 + ( c - 'A' + 10);
-	else if (c >= 'a' && c <= 'f') *val = (unsigned char)(*val) * 16 + ( c - 'a' + 10);
+int hex2byte(uc8 *val, uc8 c) {
+	if ('0' <= c && c <= '9')      *val = (uc8)(*val) * 16 + ( c - '0');
+	else if (c >= 'A' && c <= 'F') *val = (uc8)(*val) * 16 + ( c - 'A' + 10);
+	else if (c >= 'a' && c <= 'f') *val = (uc8)(*val) * 16 + ( c - 'a' + 10);
 	else return 1;
 	return 0;
 }
 
 /* TODO : cleanup */
 int hexstr2raw(char *arg) {
-	unsigned char *ptr, c, d;
+	uc8 *ptr, c, d;
 	unsigned int j, len;
 	len = c = d = j = 0;
-	for (ptr=(unsigned char *)arg;*ptr;ptr++) {
+	for (ptr=(uc8 *)arg;*ptr;ptr++) {
 		d = c;
 		if (hex2byte(&c, *ptr))
 			return -1;

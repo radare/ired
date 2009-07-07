@@ -1,6 +1,7 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
 #define ull unsigned long long 
+#define uc8 unsigned char
 static int verbose = 1;
 static char *script = 0;
 static ull oseek, seek = 0LL;
@@ -11,43 +12,19 @@ static char *red_interpret(char *file); // XXX
 
 static int red_cmd(char *cmd) {
 	switch(*cmd) {
-	case 'q':
-		return 0;
-	case '>':
-		cmd_dump(cmd+1);
-		break;
-	case '<':
-		cmd_load(cmd+1);
-		break;
-	case '.':
-		red_interpret(skipspaces(cmd+1));
-		break;
-	case 's':
-		cmd_seek(cmd+1);
-		break;
-	case 'b':
-		cmd_bsize(cmd+1);
-		break;
-	case '/':
-		cmd_search(cmd+1);
-		break;
-	case 'x':
-		cmd_hexdump(cmd+1);
-		break;
-	case 'X':
-		cmd_bytedump(cmd+1);
-		break;
-	case 'w':
-		cmd_write(cmd+1);
-		break;
-	case '!':
-		cmd_system(cmd+1);
-		break;
-	case '?':
-		cmd_help(cmd+1);
-		break;
-	default:
-		fprintf(stderr, "? %s\n", cmd);
+	case 'q': return 0;
+	case '>': cmd_dump(cmd+1); break;
+	case '<': cmd_load(cmd+1); break;
+	case '.': red_interpret(skipspaces(cmd+1)); break;
+	case 's': cmd_seek(cmd+1); break;
+	case 'b': cmd_bsize(cmd+1); break;
+	case '/': cmd_search(cmd+1); break;
+	case 'x': cmd_hexdump(cmd+1); break;
+	case 'X': cmd_bytedump(cmd+1); break;
+	case 'w': cmd_write(cmd+1); break;
+	case '!': cmd_system(cmd+1); break;
+	case '?': cmd_help(cmd+1); break;
+	default: fprintf(stderr, "? %s\n", cmd);
 	}
 	return 1;
 }
@@ -94,7 +71,7 @@ static void red_open(char *file) {
 			script = red_interpret(script);
 		while(red_prompt())
 			seek = oseek;
-		close(fd);
+		io_close();
 	} else fprintf(stderr, "Cannot open '%s'.\n", file);
 }
 
@@ -112,17 +89,10 @@ int main(int argc, char **argv) {
 			red_open(argv[i]);
 		else
 		switch(argv[i][1]) {
-		case 'i':
-			script = argv[++i];
-			break;
-		case 'n':
-			verbose = 0;
-			break;
-		case 'v':
-			puts("red "VERSION" 2009");
-			return 0;
-		case 'h':
-			return red_help();
+		case 'i': script = argv[++i]; break;
+		case 'n': verbose = 0; break;
+		case 'v': puts("red "VERSION" 2009"); return 0;
+		case 'h': return red_help();
 		}
 	}
         return 0;

@@ -7,14 +7,15 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-static int fd = -1;
+static int _fd = -1;
 
-#define io_read(x,y) read(fd, x, y)
-#define io_write(x,y) write(fd, x, y)
-#define io_open(x,y) \
-	fd = open(file, O_RDWR|O_CREAT, 0644); \
-	if (fd == -1) fd = open(file, O_RDONLY); \
-	return fd
-#define io_seek(x,y) return lseek(fd,x,y)
-#define io_close() return close(fd)
-#define io_system(x) return system(x)
+static inline int io_open(char *file) {
+	_fd = open(file, O_RDWR|O_CREAT, 0644);
+	if (_fd == -1) _fd = open(file, O_RDONLY);
+	return _fd;
+}
+#define io_read(x,y) read(_fd, x, y)
+#define io_write(x,y) write(_fd, x, y)
+#define io_seek(x,y) lseek(_fd, x, y)
+#define io_close() close(_fd)
+#define io_system(x) system(x)

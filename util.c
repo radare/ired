@@ -76,7 +76,7 @@ void *getcurblk(char *arg, unsigned int *len) {
 			*len = bsize;
 	}
 	buf = malloc(*len);
-	if (buf == NULL || io_seek(seek, SEEK_SET)<0) {
+	if (buf == NULL || (io_seek(seek, SEEK_SET)<0)) {
 		free(buf);
 		buf = NULL;
 	} else *len = io_read(buf, *len);

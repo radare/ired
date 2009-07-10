@@ -17,6 +17,8 @@ getstr() {
   stty -icanon -echo
 }
 
+echo "b 256"
+P=''
 while : ; do
   echo "!clear"
   case $P in

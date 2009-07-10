@@ -1,9 +1,10 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
 void cmd_hexdump(char *arg) {
-	unsigned char *buf = getcurblk(arg, &bsize);
+	unsigned int len = bsize;
+	unsigned char *buf = getcurblk(arg, &len);
 	if (buf) {
-		hexdump(buf, bsize);
+		hexdump(buf, len);
 		free(buf);
 	}
 }
@@ -61,7 +62,7 @@ void cmd_bytedump(char *arg) {
 	if (!buf) return;
 	for(i=0;i<len;i++)
 		printf("%02x", buf[i]);
-	puts("");
+	printf("\n");
 	free(buf);
 }
 

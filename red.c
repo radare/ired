@@ -6,7 +6,7 @@
 static int verbose = 1;
 static char *script = 0;
 static ut64 oseek, seek = 0LL;
-static int bsize = 256;
+static int obsize, bsize = 256;
 static char *red_interpret(char *file); // XXX
 
 #include "red.h"
@@ -31,7 +31,7 @@ static int red_cmd(char *cmd) {
 }
 
 static int red_prompt() {
-	char *at, line[4096];
+	char *at, *at2, line[4096];
 	if (verbose) {
 		printf("[0x%08llx]> ", seek);
 		fflush(stdout);
@@ -42,11 +42,30 @@ static int red_prompt() {
 	line[strlen(line)-1]='\0';
 	at = strchr(line, '@');
 	oseek = seek;
+	obsize = bsize;
 	if (at) {
-		*at='\0';
-		seek = str2ut64(at+1);
+		*at = 0; at++;
+		at2 = strchr(at, ':');
+		if (at2) {
+			*at2 = 0; at2++;
+			if (*at2) bsize = (int)str2ut64(at2);
+		}
+		if (*at) seek = str2ut64(at);
 	}
 	return red_cmd(skipspaces(line));
+}
+
+int red_slurpin() {
+	int len;
+	unsigned char buf[1024];
+	for(;;) {
+		len = read(0, buf, 1024);
+		if (len<1)
+			break;
+		hexdump(buf, len);
+		seek+=len;
+	}
+	return 0;
 }
 
 static char *red_interpret(char *file) {
@@ -70,8 +89,10 @@ static void red_open(char *file) {
 	if (io_open(file) != -1) {
 		if (script)
 			script = red_interpret(script);
-		while(red_prompt())
+		while(red_prompt()) {
 			seek = oseek;
+			bsize = obsize;
+		}
 		io_close();
 	} else fprintf(stderr, "Cannot open '%s'.\n", file);
 }
@@ -94,6 +115,7 @@ int main(int argc, char **argv) {
 		case 'n': verbose = 0; break;
 		case 'v': puts("red "VERSION" 2009"); return 0;
 		case 'h': return red_help();
+		case 0: return red_slurpin();
 		}
 	}
         return 0;

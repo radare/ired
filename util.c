@@ -6,6 +6,27 @@ inline char *skipspaces(char *arg) {
 	return arg;
 }
 
+#define HEXWIDTH 16
+void hexdump(const unsigned char *buf, int len) {
+	unsigned int i, j;
+	for(i=0;i<len;i+=HEXWIDTH) {
+		printf("0x%08llx ", seek+i);
+		for(j=i;j<i+HEXWIDTH;j++) {
+			if (j>=len) {
+				printf(j%2?"   ":"  ");
+				continue;
+			}
+			printf("%02x", buf[j]);
+			if (j%2) printf(" ");
+		}
+		for(j=i;j<i+HEXWIDTH;j++) {
+			if (j>=len) printf(" ");
+			else printf("%c", isprint(buf[j])?buf[j]:'.');
+		}
+		printf("\n");
+	}
+}
+
 ut64 str2ut64(char *str) {
 	ut64 ret = 0LL;
 	str = skipspaces(str);

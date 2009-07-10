@@ -1,35 +1,18 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
-#define HEXWIDTH 16
 void cmd_hexdump(char *arg) {
-	unsigned int i, j, len = bsize;
+	unsigned int len = bsize;
 	unsigned char *buf = getcurblk(arg, &len);
-	if (!buf)
-		return;
-	for(i=0;i<len;i+=HEXWIDTH) {
-		printf("0x%08llx ", seek+i);
-		for(j=i;j<i+HEXWIDTH;j++) {
-			if (j>=len) {
-				printf(j%2?"   ":"  ");
-				continue;
-			}
-			printf("%02x", buf[j]);
-			if (j%2) printf(" ");
-		}
-		for(j=i;j<i+HEXWIDTH;j++) {
-			if (j>=len) printf(" ");
-			else printf("%c", isprint(buf[j])?buf[j]:'.');
-		}
-		printf("\n");
+	if (buf) {
+		hexdump(buf, len);
+		free(buf);
 	}
-	free(buf);
 }
 
 void cmd_bytedump(char *arg) {
 	unsigned int i, len = bsize;
 	unsigned char *buf = getcurblk(arg, &len);
-	if (!buf)
-		return;
+	if (!buf) return;
 	for(i=0;i<len;i++)
 		printf("%02x", buf[i]);
 	printf("\n");

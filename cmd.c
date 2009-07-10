@@ -44,21 +44,22 @@ void cmd_bsize(char *arg) {
 	if (!*arg)
 		printf("%d\n", bsize);
 	else if (*arg=='+')
-		bsize+=str2ut64(arg+1);
+		bsize += (int)str2ut64(arg+1);
 	else if (*arg=='-')
-		bsize-=str2ut64(arg+1);
+		bsize -= (int)str2ut64(arg+1);
 	else bsize = str2ut64(arg);
 	if (bsize<1)
 		bsize = 1;
+	obsize = bsize;
 }
 
 void cmd_seek(char *arg) {
 	if (!*arg)
 		printf("%lld\n", seek);
 	else if (*arg=='+')
-		oseek = seek+=str2ut64(arg+1);
+		oseek = seek += str2ut64(arg+1);
 	else if (*arg=='-')
-		oseek = seek-=str2ut64(arg+1);
+		oseek = seek -= str2ut64(arg+1);
 	else oseek = seek = str2ut64(arg);
 }
 

@@ -3,7 +3,7 @@
 #define HEXWIDTH 16
 void cmd_hexdump(char *arg) {
 	unsigned int i, j, len = bsize;
-	unsigned char *buf = getcurblk(arg);
+	unsigned char *buf = getcurblk(arg, &len);
 	if (!buf)
 		return;
 	for(i=0;i<len;i+=HEXWIDTH) {
@@ -27,7 +27,7 @@ void cmd_hexdump(char *arg) {
 
 void cmd_bytedump(char *arg) {
 	unsigned int i, len = bsize;
-	unsigned char *buf = getcurblk(arg);
+	unsigned char *buf = getcurblk(arg, &len);
 	if (!buf)
 		return;
 	for(i=0;i<len;i++)
@@ -44,7 +44,7 @@ void cmd_search(char *arg) {
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-	buf = getcurblk("");
+	buf = getcurblk("", &len);
 	do {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i])
@@ -80,9 +80,10 @@ void cmd_seek(char *arg) {
 }
 
 void cmd_dump(char *file) {
-	void *buf = getcurblk("");
+	unsigned int len = bsize;
+	void *buf = getcurblk("", &len);
 	FILE *fd = fopen(file, "wb");
-	fwrite(buf, bsize, 1, fd);
+	fwrite(buf, len, 1, fd);
 	fclose(fd);
 }
 

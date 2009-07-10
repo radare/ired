@@ -26,8 +26,8 @@ int hex2byte(ut8 *val, ut8 c) {
 
 /* TODO : cleanup */
 int hexstr2raw(char *arg) {
-	ut8 *ptr, c, d;
 	unsigned int j, len;
+	ut8 *ptr, c, d;
 	len = c = d = j = 0;
 	for (ptr=(ut8 *)arg;*ptr;ptr++) {
 		d = c;
@@ -45,21 +45,18 @@ int hexstr2raw(char *arg) {
 	return len;
 }
 
-void *getcurblk(char *arg) {
+void *getcurblk(char *arg, unsigned int *len) {
 	void *buf;
-	int len = bsize;
 	if (*arg) {
-		len = (int)str2ut64(arg);
-		if (len <1)
-			len = bsize;
+		*len = (int)str2ut64(arg);
+		if (*len <1)
+			*len = bsize;
 	}
-	buf = malloc(len);
-	if (buf == NULL) {
-		fprintf(stderr, "Cannot malloc %d bytes.\n", len);
-		return NULL;
-	}
-	io_seek(seek, SEEK_SET);
-	len = io_read(buf, len);
+	buf = malloc(*len);
+	if (buf == NULL || io_seek(seek, SEEK_SET)<0) {
+		free(buf);
+		buf = NULL;
+	} else *len = io_read(buf, *len);
 	return buf;
 }
 

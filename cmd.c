@@ -12,7 +12,9 @@ void cmd_hexdump(char *arg) {
 /* TODO: cleanup and simplify!! */
 void cmd_print(char *arg) {
 	unsigned char *buf, *obuf;
-	unsigned int inc, lup=0, up, len = bsize, rep = 0;
+	char *oarg = arg;
+	unsigned int i, inc=0, lup=0, up, len = bsize, rep = 0;
+i=0;
 	if (!*arg) printf( /* TODO: simplify help message */
 		"b/w/d/q   byte, word, dword, qword (little endian)\n"
 		"B/W/D/Q   byte, word, dword, qword (big endian)\n"
@@ -24,34 +26,44 @@ void cmd_print(char *arg) {
 		"*         repeat last format until death\n");
 	else {
 		obuf = buf = getcurblk(arg, &len);
-		for(;(*arg||rep);arg++) {
-			up = rep?rep:*arg;
-			switch(up) {
-			case 'i': printf("%d\n", ((buf[0]<<24) | (buf[1]<<16) | (buf[2]<<8) | buf[3])); inc=4; break;
-			case 'I': printf("%d\n", ((buf[3]<<24) | (buf[2]<<16) | (buf[1]<<8) | buf[0])); inc=4; break;
-			case 's': printf("%d\n", (buf[0]<<8 | buf[1])); inc=2; break;
-			case 'S': printf("%d\n", (buf[1]<<8 | buf[0])); inc=2; break;
-			case 'o': printf("%oo\n", buf[0]); inc=1; break;
-			case 'B': case 'b': printf("0x%02x\n", buf[0]); inc=1; break;
-			case 'w': printf("0x%02x%02x\n", buf[1], buf[0]); inc=2; break;
-			case 'W': printf("0x%02x%02x\n", buf[0], buf[1]); inc=2; break;
-			case 'd': printf("0x%02x%02x%02x%02x\n",buf[3], buf[2], buf[1], buf[0]); inc=4; break;
-			case 'D': printf("0x%02x%02x%02x%02x\n", buf[0], buf[1], buf[2], buf[3]); inc=4; break;
-			case 'q': printf("0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
-				buf[7], buf[6], buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]); inc=8; break;
-			case 'Q': printf("0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
-				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]); inc=8; break;
-			case 'z': break;
-			case '.': inc=1; break;
-			case ':': inc=4; break;
-			case '*': rep = lup; break;
-			default: fprintf(stderr, "UNKNOWN FORMAT CHAR (%d)(%c)\n", up, up);
+		if (buf != NULL)
+		do {
+			/* TODO: move into util.c as print_fmt */
+			for(;(*arg||rep);arg++) {
+				up = rep?rep:*arg;
+				switch(up) {
+				case 'i': if (len>3) printf("%d\n", ((buf[0]<<24) | (buf[1]<<16) | (buf[2]<<8) | buf[3])); inc=4; break;
+				case 'I': if (len>3) printf("%d\n", ((buf[3]<<24) | (buf[2]<<16) | (buf[1]<<8) | buf[0])); inc=4; break;
+				case 's': if (len>1) printf("%d\n", (buf[0]<<8 | buf[1])); inc=2; break;
+				case 'S': if (len>1) printf("%d\n", (buf[1]<<8 | buf[0])); inc=2; break;
+				case 'o': if (len>0) printf("%oo\n", buf[0]); inc=1; break;
+				case 'B': case 'b': if (len>0) printf("0x%02x\n", buf[0]); inc=1; break;
+				case 'w': if (len>1) printf("0x%02x%02x\n", buf[1], buf[0]); inc=2; break;
+				case 'W': if (len>1) printf("0x%02x%02x\n", buf[0], buf[1]); inc=2; break;
+				case 'd': if (len>3) printf("0x%02x%02x%02x%02x\n",buf[3], buf[2], buf[1], buf[0]); inc=4; break;
+				case 'D': if (len>3) printf("0x%02x%02x%02x%02x\n", buf[0], buf[1], buf[2], buf[3]); inc=4; break;
+				case 'q': if (len>7) printf("0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+					  buf[7], buf[6], buf[5], buf[4], buf[3], buf[2], buf[1], buf[0]); inc=8; break;
+				case 'Q': if (len>7) printf("0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
+					  buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]); inc=8; break;
+				case '.': inc=1; break;
+				case ':': inc=4; break;
+				case 'z': 
+					  for(i=0; inc<len && buf[0] ;i++) { 
+						  printf("%c", buf[0]); 
+						  buf++; inc++; } 
+						  if (i) printf("\n"); break;
+				case '*': rep = lup; break;
+				default: fprintf(stderr, "UNKNOWN FORMAT CHAR (%d)(%c)\n", up, up);
+				}
+				if (!rep) lup = up;
+				buf += inc;
+				if (inc>len) break;
+				len -= inc;
 			}
-			if (!rep) lup = up;
-			buf += inc;
-			if (inc>len) break;
-			len -= inc;
-		}
+			if (inc>len) break; /* XXX: ugly */
+			arg = oarg;
+		} while(!rep);
 		free(obuf);
 	}
 }

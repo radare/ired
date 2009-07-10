@@ -105,7 +105,7 @@ void cmd_help(char *arg) {
 	} else printf(
 	"s[+-addr]     seek to relative or absolute address\n"
 	"b[+-size]     change block size\n"
-	"w[hex|\"str\"]  change block size\n"
+	"w[hex|\"str\"]  write hexpair or string\n"
 	"/[hex|\"str\"]  search hexpair or string\n"
 	"x[size]       hexdump\n"
 	".[file]       interpret file\n"

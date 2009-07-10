@@ -5,27 +5,41 @@ red aims to be a minimalistic reimplementation of the radare shell
 without much complexity and relaying all the extensibility to
 external applications trying to keep the source as small as possible.
 
+COMMANDS
+========
+
 ? is for help
 x hexdump
 X dword dump   (32bit hex values?)
 o octdump
+> file          dump current block to file
+< file          slurp file into current block
 w "string\x00"  write string
 w 023839400     write hexpairs
 b 30            set block size
 s addr          seek address
 o open          allow to open file number # or named
                 no arguments show all files in argv
-peek/poke from files? using the '<' and '>' commands
 
-TODO
-====
+print command
+ b/w/d/q   byte, word, dword, qword (little endian)
+ B/W/D/Q   byte, word, dword, qword (big endian)
+ i/I/f/F   int32 (lil, big), float (lil, big)
+ z/Z       zero-terminatted strings
+ s/S       pointer to string
+ ./:       skip 1 or 4 chars
+ *         repeat last value until death
+
+TODO/TOTHINK
+============
+Remove '.' command? do it suckless
 filesize support
-go next/previous/file  - o #
 endian support
 dump in hex like in gdb's x/x
 
 flags (implement basic 'f' command to flag) usable from seek
   - better to use flags defined on a file, and use grep and
     so on to retrieve them?
+
 
 --pancake

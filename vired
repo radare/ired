@@ -27,6 +27,8 @@ while : ; do
   case $A in
   'j') echo "s+16" ;;
   'k') echo "s-16" ;;
+  'J') echo "s+b" ;;
+  'K') echo "s-b" ;;
   'h') echo "s-1" ;;
   'l') echo "s+1" ;;
   'q') stty $ttyset; exit ;;

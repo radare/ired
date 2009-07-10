@@ -30,7 +30,9 @@ void hexdump(const unsigned char *buf, int len) {
 ut64 str2ut64(char *str) {
 	ut64 ret = 0LL;
 	str = skipspaces(str);
-	if (str[0]=='0'&&str[1]=='x')
+	if (str[0]=='b'&&str[1]==0)
+		ret = bsize;
+	else if (str[0]=='0'&&str[1]=='x')
 		sscanf(str, "0x%llx", &ret);
 	else sscanf(str, "%lld", &ret);
 	return ret;

@@ -6,7 +6,7 @@
 static int verbose = 1;
 static char *script = 0;
 static ut64 oseek, seek = 0LL;
-static int obsize, bsize = 256;
+static unsigned int obsize, bsize = 256;
 static char *red_interpret(char *file); // XXX
 
 #include "red.h"
@@ -20,6 +20,7 @@ static int red_cmd(char *cmd) {
 	case 's': cmd_seek(cmd+1); break;
 	case 'b': cmd_bsize(cmd+1); break;
 	case '/': cmd_search(cmd+1); break;
+	case 'p': cmd_print(cmd+1); break;
 	case 'x': cmd_hexdump(cmd+1); break;
 	case 'X': cmd_bytedump(cmd+1); break;
 	case 'w': cmd_write(cmd+1); break;
@@ -40,17 +41,19 @@ static int red_prompt() {
 	if (feof(stdin))
 		return 0;
 	line[strlen(line)-1]='\0';
-	at = strchr(line, '@');
-	oseek = seek;
-	obsize = bsize;
-	if (at) {
-		*at = 0; at++;
-		at2 = strchr(at, ':');
-		if (at2) {
-			*at2 = 0; at2++;
-			if (*at2) bsize = (int)str2ut64(at2);
+	if (line[0] != '!') {
+		at = strchr(line, '@');
+		oseek = seek;
+		obsize = bsize;
+		if (at) {
+			*at = 0; at++;
+			at2 = strchr(at, ':');
+			if (at2) {
+				*at2 = 0; at2++;
+				if (*at2) bsize = (int)str2ut64(at2);
+			}
+			if (*at) seek = str2ut64(at);
 		}
-		if (*at) seek = str2ut64(at);
 	}
 	return red_cmd(skipspaces(line));
 }

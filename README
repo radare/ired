@@ -21,23 +21,32 @@ s addr          seek address
 o open          allow to open file number # or named
                 no arguments show all files in argv
 
+
+WORK IN PROGRESS
+================
 print command
  b/w/d/q   byte, word, dword, qword (little endian)
  B/W/D/Q   byte, word, dword, qword (big endian)
  i/I/f/F   int32 (lil, big), float (lil, big)
  z/Z       zero-terminatted strings
- s/S       pointer to string
+ s/S       pointer to string # too complex for red (NOT IMPLEMENTED)
  ./:       skip 1 or 4 chars
  *         repeat last value until death
 
+TODO:
+=====
+- support for escapped characters in string write and search ops
+- resize command
+  r/d : resize or delete N bytes (d 128@:999) must truncate if possible
+- Add support for simple math ops (+,-,*,/) no parenthesis plz :)
+
 TODO/TOTHINK
 ============
-Remove '.' command? do it suckless
-filesize support
-endian support
-dump in hex like in gdb's x/x
-
-flags (implement basic 'f' command to flag) usable from seek
+- Remove '.' command? do it suckless
+- filesize support
+- endian support
+- dump in hex like in gdb's x/x
+- flags (implement basic 'f' command to flag) usable from seek
   - better to use flags defined on a file, and use grep and
     so on to retrieve them?
 

@@ -6,8 +6,10 @@ if [ -n "$1" ]; then
   $0 | red -n $@
   exit 0
 fi
+
 ttyset=`stty -g`
 stty -echo -icanon min 1
+
 getstr() {
   stty icanon echo
   read A
@@ -35,6 +37,7 @@ while : ; do
   'b') printf 'b '>/dev/tty; echo b `getstr` ;;
   'w') printf 'w '>/dev/tty; echo w `getstr` ;;
   's') printf 's '>/dev/tty; echo s `getstr` ;;
+  'r') printf 'r '>/dev/tty; echo r `getstr` ;;
   ':') printf ': '>/dev/tty; echo `getstr`; read A ;;
   '?') echo '?'; read A ;;
   '+') echo "b+1" ;;

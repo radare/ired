@@ -139,7 +139,8 @@ static void cmd_help(char *arg) {
 
 static void cmd_resize(char *arg) {
 	unsigned int len;
-	if (*arg=='-') {
+	if (!*arg) fprintf(stderr, "File size: unknown\n"); // TODO
+	else if (*arg=='-') {
 		ut8 *buf = malloc(bsize);
 		ut64 i, n = str2ut64(arg+1);
 		if (buf) {
@@ -157,7 +158,7 @@ static void cmd_resize(char *arg) {
 
 static void cmd_system(char *arg) {
 	unsigned int len = bsize;
-	char *buf;
+	char *buf = NULL;
 	if (strstr(arg, "BLOCK")) {
 		FILE *fd = fopen(".curblk", "w");
 		if (fd) {

@@ -128,12 +128,31 @@ static void cmd_help(char *arg) {
 	"x[size]       hexdump\n"
 	"X[size]       hexpair dump\n"
 	"p[fmt]        print formatted current block ('p' for help)\n"
+	"r[-[num]]     truncate or -remove N bytes\n"
 	".[file]       interpret file\n"
 	"<[file]       load file in current seek\n"
 	">[file]       dump current block to file\n"
 	"!cmd          run shell command\n"
 	"?expr         calculate numeric expression\n"
 	"q             quit\n");
+}
+
+static void cmd_resize(char *arg) {
+	unsigned int len;
+	if (*arg=='-') {
+		ut8 *buf = malloc(bsize);
+		ut64 i, n = str2ut64(arg+1);
+		if (buf) {
+			for(i=0;;i+=len) {
+				io_seek(seek+n+i, SEEK_SET);
+				len = io_read(buf, bsize);
+				if (len<1) break;
+				io_seek(seek+i, SEEK_SET);
+				io_write(buf, len);
+			}
+			free(buf);
+		}
+	} else io_truncate(str2ut64(arg));
 }
 
 static void cmd_system(char *arg) {

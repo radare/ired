@@ -48,6 +48,7 @@ static int red_cmd(char *cmd) {
 	case 'b': cmd_bsize(cmd+1); break;
 	case '/': cmd_search(cmd+1); break;
 	case 'p': cmd_print(cmd+1); break;
+	case 'r': cmd_resize(cmd+1); break;
 	case 'x': cmd_hexdump(cmd+1); break;
 	case 'X': cmd_bytedump(cmd+1); break;
 	case 'w': cmd_write(cmd+1); break;
@@ -65,9 +66,8 @@ static int red_prompt() {
 		fflush(stdout);
 	}
 	fgets(line, 4095, stdin);
-	if (feof(stdin))
-		return 0;
-	line[strlen(line)-1]='\0';
+	if (feof(stdin)) return 0;
+	line[strlen(line)-1] = 0;
 	if (line[0] != '!') {
 		at = strchr(line, '@');
 		oseek = seek;

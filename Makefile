@@ -1,5 +1,5 @@
 CC?=gcc
-CFLAGS+=-Wall
+CFLAGS+=-Wall -g
 PREFIX?=/usr
 
 all: clean red.o

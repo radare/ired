@@ -6,10 +6,8 @@ if [ -n "$1" ]; then
   $0 | red -n $@
   exit 0
 fi
-
 ttyset=`stty -g`
 stty -echo -icanon min 1
-
 getstr() {
   stty icanon echo
   read A
@@ -17,8 +15,8 @@ getstr() {
   stty -icanon -echo
 }
 
-echo "b 256"
 P=''
+echo "b 256"
 while : ; do
   echo "!clear"
   case $P in

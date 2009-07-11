@@ -105,10 +105,11 @@ static void *getcurblk(char *arg, unsigned int *len) {
 		*len = (int)str2ut64(arg);
 		if (*len <1) *len = bsize;
 	}
-	if ((buf = malloc(*len) != NULL)
-	if (io_seek(seek, SEEK_SET)<0)) {
-		free(buf);
-		buf = NULL;
-	} else *len = io_read(buf, *len);
+	if ((buf = malloc(*len)) != NULL) {
+		if (io_seek(seek, SEEK_SET)<0) {
+			free(buf);
+			buf = NULL;
+		} else *len = io_read(buf, *len);
+	}
 	return buf;
 }

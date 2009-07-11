@@ -7,7 +7,7 @@ static inline char *skipspaces(char *arg) {
 }
 
 #define HEXWIDTH 16
-static void hexdump(const unsigned char *buf, unsigned int len) {
+static void hexdump(const ut8 *buf, unsigned int len) {
 	unsigned int i, j;
 	for(i=0;i<len;i+=HEXWIDTH) {
 		printf("0x%08llx ", seek+i);
@@ -27,9 +27,9 @@ static void hexdump(const unsigned char *buf, unsigned int len) {
 	}
 }
 
-static void print_fmt(const unsigned char *buf, char *fmt, unsigned int len) {
-	char *ofmt = fmt;
+static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 	unsigned int i, inc=0, lup=0, up, rep = 0;
+	char *ofmt = fmt;
 	do {
 		for(;(*fmt||rep);fmt++) {
 			up = rep?rep:*fmt;
@@ -83,22 +83,19 @@ static int hex2byte(ut8 *val, ut8 c) {
 	return 0;
 }
 
-/* TODO : cleanup */
 static int hexstr2raw(char *arg) {
-	unsigned int j, len;
-	ut8 *ptr, c, d;
-	len = c = d = j = 0;
+	ut8 *ptr, c = 0, d = 0;
+	unsigned int j = 0, len = 0;
 	for (ptr=(ut8 *)arg;*ptr;ptr++) {
 		d = c;
 		if (hex2byte(&c, *ptr))
 			return -1;
 		c |= d;
-		if (j++ == 0) c <<= 4;
-		if (j==2) {
+		if (!j++) c <<= 4;
+		else if (j==2) {
 			arg[len++] = c;
 			c = j = 0;
-			if (*ptr==' ')
-				continue;
+			if (*ptr==' ') continue;
 		}
 	}
 	return len;

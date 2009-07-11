@@ -87,6 +87,7 @@ static int red_prompt() {
 
 static void red_open(char *file) {
 	oseek = 0;
+	setenv("FILE", file, 1);
 	if (io_open(file) != -1) {
 		if (script)
 			script = red_interpret(script);
@@ -108,16 +109,14 @@ int main(int argc, char **argv) {
 	if (argc==1)
 		return red_help();
 	for(i=1;i<argc;i++) {
-		if (argv[i][0]!='-')
-			red_open(argv[i]);
-		else
-		switch(argv[i][1]) {
-		case 'i': script = argv[++i]; break;
-		case 'n': verbose = 0; break;
-		case 'v': puts("red "VERSION" 2009"); return 0;
-		case 'h': return red_help();
-		case 0: return red_slurpin();
-		}
+		if (argv[i][0]=='-')
+			switch(argv[i][1]) {
+			case 'i': script = argv[++i]; break;
+			case 'n': verbose = 0; break;
+			case 'v': puts("red "VERSION" 2009"); return 0;
+			case 'h': return red_help();
+			case 0: return red_slurpin();
+		} else red_open(argv[i]);
 	}
         return 0;
 }

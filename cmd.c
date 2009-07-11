@@ -127,28 +127,30 @@ static void cmd_help(char *arg) {
 	"/[hex|\"str\"]  search hexpair or string\n"
 	"x[size]       hexdump\n"
 	"X[size]       hexpair dump\n"
-	"p[fmt]        print current block with format ('p' for help)\n"
+	"p[fmt]        print formatted current block ('p' for help)\n"
 	".[file]       interpret file\n"
 	"<[file]       load file in current seek\n"
 	">[file]       dump current block to file\n"
 	"!cmd          run shell command\n"
+	"?expr         calculate numeric expression\n"
 	"q             quit\n");
 }
 
 static void cmd_system(char *arg) {
-	FILE *f;
-	int len;
-	char *buf = malloc(bsize+128);
+	unsigned int len = bsize;
+	char *buf;
 	if (strstr(arg, "BLOCK")) {
-		setenv("BLOCK", ".curblk", 1);
-		f = fopen(".curblk", "w");
-		io_seek(seek, SEEK_SET);
-		len = io_read(buf, bsize);
-		fwrite(buf, len, 1, f);
-		fclose(f);
+		FILE *fd = fopen(".curblk", "w");
+		if (fd) {
+			buf = getcurblk("", &len);
+			if (buf) {
+				setenv("BLOCK", ".curblk", 1);
+				fwrite(buf, len, 1, fd);
+				fclose(fd);
+				free(buf);
+			}
+		}
 	}
-	if (strstr(arg, "FILE"))
-		setenv("FILE", "/bin/ls", 1); // XXX
 	if (strstr(arg, "OFFSET")) {
 		sprintf(buf, "%lld", seek);
 		setenv("OFFSET", buf, 1); // XXX

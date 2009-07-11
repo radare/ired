@@ -44,7 +44,7 @@ void cmd_search(char *arg) {
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-	if (buf = getcurblk("", &len))
+	if ((buf = getcurblk("", &len)))
 	do {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i]) hit = 0;

@@ -106,8 +106,7 @@ static int red_help() {
 
 int main(int argc, char **argv) {
 	int i;
-	if (argc==1)
-		return red_help();
+	if (argc>1)
 	for(i=1;i<argc;i++) {
 		if (argv[i][0]=='-')
 			switch(argv[i][1]) {
@@ -115,8 +114,8 @@ int main(int argc, char **argv) {
 			case 'n': verbose = 0; break;
 			case 'v': puts("red "VERSION" 2009"); return 0;
 			case 'h': return red_help();
-			case 0: return red_slurpin();
+			case 0x0: return red_slurpin();
 		} else red_open(argv[i]);
-	}
+	} else return red_help();
         return 0;
 }

@@ -17,7 +17,7 @@ int red_slurpin() {
 	for(;;) {
 		len = read(0, buf, 4096);
 		if (len<1) break;
-		hexdump(buf, len);
+		hexdump(buf, len, 16);
 		seek += len;
 	}
 	return 0;
@@ -25,15 +25,15 @@ int red_slurpin() {
 
 static char *red_interpret(char *file) {
 	char buf[1024];
-	FILE *fh = fopen(file, "r");
-	if (fh != NULL) {
+	FILE *fd = fopen(file, "r");
+	if (fd != NULL) {
 		file = NULL;
 		for(;;) {
-			fgets(buf, 1023, fh);
-			if (feof(fh)) break;
+			fgets(buf, 1023, fd);
+			if (feof(fd)) break;
 			red_cmd(buf);
 		}
-		fclose(fh);
+		fclose(fd);
 	} else fprintf(stderr, "Cannot open script file '%s'\n", file);
 	return file;
 }
@@ -100,7 +100,7 @@ static void red_open(char *file) {
 }
 
 static int red_help() {
-	puts("red [-nhv] [-i script] [file] [..]");
+	puts("red [-hnv] [-i script] [file] [..]");
 	return 0;
 }
 

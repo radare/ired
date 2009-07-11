@@ -7,7 +7,6 @@
 #include <stdlib.h>
 
 static int _fd = -1;
-
 static inline int io_open(char *file) {
 	_fd = open(file, O_RDWR|O_CREAT, 0644);
 	if (_fd == -1) _fd = open(file, O_RDONLY);

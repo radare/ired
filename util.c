@@ -1,17 +1,15 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
 static inline char *skipspaces(char *arg) {
-	if (*arg==' '||*arg=='\t')
-		arg++;
+	while (*arg==' '||*arg=='\t') arg++;
 	return arg;
 }
 
-#define HEXWIDTH 16
-static void hexdump(const ut8 *buf, unsigned int len) {
+static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	unsigned int i, j;
-	for(i=0;i<len;i+=HEXWIDTH) {
+	for(i=0;i<len;i+=w) {
 		printf("0x%08llx ", seek+i);
-		for(j=i;j<i+HEXWIDTH;j++) {
+		for(j=i;j<i+w;j++) {
 			if (j>=len) {
 				printf(j%2?"   ":"  ");
 				continue;
@@ -19,7 +17,7 @@ static void hexdump(const ut8 *buf, unsigned int len) {
 			printf("%02x", buf[j]);
 			if (j%2) printf(" ");
 		}
-		for(j=i;j<i+HEXWIDTH;j++) {
+		for(j=i;j<i+w;j++) {
 			if (j>=len) printf(" ");
 			else printf("%c", isprint(buf[j])?buf[j]:'.');
 		}
@@ -30,7 +28,7 @@ static void hexdump(const ut8 *buf, unsigned int len) {
 static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 	unsigned int i, inc=0, lup=0, up, rep = 0;
 	char *ofmt = fmt;
-	do {
+	do { /* TODO: needs cleanup */
 		for(;(*fmt||rep);fmt++) {
 			up = rep?rep:*fmt;
 			switch(up) {
@@ -105,11 +103,10 @@ static void *getcurblk(char *arg, unsigned int *len) {
 	void *buf;
 	if (*arg) {
 		*len = (int)str2ut64(arg);
-		if (*len <1)
-			*len = bsize;
+		if (*len <1) *len = bsize;
 	}
-	buf = malloc(*len);
-	if (buf == NULL || (io_seek(seek, SEEK_SET)<0)) {
+	if ((buf = malloc(*len) != NULL)
+	if (io_seek(seek, SEEK_SET)<0)) {
 		free(buf);
 		buf = NULL;
 	} else *len = io_read(buf, *len);

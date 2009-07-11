@@ -4,7 +4,7 @@ static void cmd_hexdump(char *arg) {
 	unsigned int len = bsize;
 	unsigned char *buf = getcurblk(arg, &len);
 	if (buf) {
-		hexdump(buf, len);
+		hexdump(buf, len, 16);
 		free(buf);
 	}
 }
@@ -90,14 +90,12 @@ static void cmd_dump(char *file) {
 }
 
 static void cmd_load(char *file) {
-	FILE *fd = fopen(file, "rb");
-	int len = bsize;
 	void *buf;
-	if (!fd)
-		return;
+	unsigned int len = bsize;
+	FILE *fd = fopen(file, "rb");
+	if (!fd) return;
 	buf = malloc(bsize);
-	if (!buf)
-		return;
+	if (!buf) return;
 	len = fread(buf, 1, len, fd);
 	io_write(buf, len);
 	fclose(fd);
@@ -139,7 +137,7 @@ static void cmd_help(char *arg) {
 
 static void cmd_resize(char *arg) {
 	unsigned int len;
-	if (!*arg) fprintf(stderr, "File size: unknown\n"); // TODO
+	if (!*arg) printf("%lld\n", io_seek(0, SEEK_END));
 	else if (*arg=='-') {
 		ut8 *buf = malloc(bsize);
 		ut64 i, n = str2ut64(arg+1);
@@ -153,12 +151,13 @@ static void cmd_resize(char *arg) {
 			}
 			free(buf);
 		}
+		io_truncate(io_seek(0, SEEK_END)-n);
 	} else io_truncate(str2ut64(arg));
 }
 
 static void cmd_system(char *arg) {
 	unsigned int len = bsize;
-	char *buf = NULL;
+	char *buf, str[64];
 	if (strstr(arg, "BLOCK")) {
 		FILE *fd = fopen(".curblk", "w");
 		if (fd) {
@@ -172,12 +171,12 @@ static void cmd_system(char *arg) {
 		}
 	}
 	if (strstr(arg, "OFFSET")) {
-		sprintf(buf, "%lld", seek);
-		setenv("OFFSET", buf, 1); // XXX
+		sprintf(str, "%lld", seek);
+		setenv("OFFSET", str, 1); // XXX
 	}
 	if (strstr(arg, "XOFFSET")) {
-		sprintf(buf, "0x%llx", seek);
-		setenv("XOFFSET", buf, 1); // XXX
+		sprintf(str, "0x%llx", seek);
+		setenv("XOFFSET", str, 1); // XXX
 	}
 	io_system(arg);
 	unlink(".curblk");

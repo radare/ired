@@ -1,5 +1,5 @@
 RED stands for the raw editor
-=============================
+============================= --pancake
 
 red aims to be a minimalistic reimplementation of the radare shell
 without much complexity and relaying all the extensibility to
@@ -40,6 +40,5 @@ TODO:
 TODO/TOTHINK
 ============
 - Remove '.' command? do it suckless
-
-
---pancake
+- Add .! command that runs !foo > file and then .file
+- Support for multiple commands in a single line (';' separator)

@@ -36,7 +36,7 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 			case 'I': if (len>3) printf("%d\n", ((buf[3]<<24) | (buf[2]<<16) | (buf[1]<<8) | buf[0])); inc=4; break;
 			case 's': if (len>1) printf("%d\n", (buf[0]<<8 | buf[1])); inc=2; break;
 			case 'S': if (len>1) printf("%d\n", (buf[1]<<8 | buf[0])); inc=2; break;
-			case 'o': if (len>0) printf("%oo\n", buf[0]); inc=1; break;
+			case 'o': if (len>0) printf("0%o\n", buf[0]); inc=1; break;
 			case 'B': case 'b': if (len>0) printf("0x%02x\n", buf[0]); inc=1; break;
 			case 'w': if (len>1) printf("0x%02x%02x\n", buf[1], buf[0]); inc=2; break;
 			case 'W': if (len>1) printf("0x%02x%02x\n", buf[0], buf[1]); inc=2; break;
@@ -67,9 +67,14 @@ static ut64 str2ut64(char *str) {
 	str = skipspaces(str);
 	if (str[0]=='b'&&str[1]==0)
 		ret = bsize;
-	else if (str[0]=='0'&&str[1]=='x')
-		sscanf(str, "0x%llx", &ret);
-	else sscanf(str, "%lld", &ret);
+	else if (str[0]=='0') {
+		if (str[1]=='x') sscanf(str, "0x%llx", &ret);
+		else sscanf(str, "0x%llo", &ret);
+	} else sscanf(str, "%lld", &ret);
+	str+=strlen(str)-1;
+	if (*str=='K') ret *= 1024;
+	else if (*str=='M') ret *= 1024*1024;
+	else if (*str=='G') ret *= 1024*1024*1024;
 	return ret;
 }
 
@@ -85,6 +90,7 @@ static int hexstr2raw(char *arg) {
 	ut8 *ptr, c = 0, d = 0;
 	unsigned int j = 0, len = 0;
 	for (ptr=(ut8 *)arg;*ptr;ptr++) {
+		if (*ptr==' ') continue;
 		d = c;
 		if (hex2byte(&c, *ptr))
 			return -1;
@@ -93,7 +99,6 @@ static int hexstr2raw(char *arg) {
 		else if (j==2) {
 			arg[len++] = c;
 			c = j = 0;
-			if (*ptr==' ') continue;
 		}
 	}
 	return len;

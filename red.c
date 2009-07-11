@@ -96,7 +96,7 @@ static void red_open(char *file) {
 			bsize = obsize;
 		}
 		io_close();
-	} else fprintf(stderr, "Cannot open '%s'.\n", file);
+	} else fprintf(stderr, "Cannot open '%s'\n", file);
 }
 
 static int red_help() {

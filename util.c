@@ -37,7 +37,7 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 			case 's': if (len>1) printf("%d\n", (buf[0]<<8 | buf[1])); inc=2; break;
 			case 'S': if (len>1) printf("%d\n", (buf[1]<<8 | buf[0])); inc=2; break;
 			case 'o': if (len>0) printf("0%o\n", buf[0]); inc=1; break;
-			case 'B': case 'b': if (len>0) printf("0x%02x\n", buf[0]); inc=1; break;
+			case 'b': if (len>0) printf("0x%02x\n", buf[0]); inc=1; break;
 			case 'w': if (len>1) printf("0x%02x%02x\n", buf[1], buf[0]); inc=2; break;
 			case 'W': if (len>1) printf("0x%02x%02x\n", buf[0], buf[1]); inc=2; break;
 			case 'd': if (len>3) printf("0x%02x%02x%02x%02x\n",buf[3], buf[2], buf[1], buf[0]); inc=4; break;
@@ -48,8 +48,8 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 				  buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]); inc=8; break;
 			case '.': inc=1; break;
 			case ':': inc=4; break;
-			case 'z': for(i=0; inc<len && buf[0] ;i++) { printf("%c", buf[0]); buf++; inc++; } if (i) printf("\n"); break;
-			case 'Z': for(i=0; inc<len && buf[0] ;i++) { printf("%c", buf[0]); buf+=2; inc+=2; } if (i) printf("\n"); break;
+			case 'z': for(i=0; inc<len && isascii(buf[0]);i++) { printf("%c", buf[0]); buf++; inc++; } if(i)printf("\n"); break;
+			case 'Z': for(i=0; inc<len && isascii(buf[0]);i++) { printf("%c", buf[0]); buf+=2; inc+=2; } if(i)printf("\n"); break;
 			case '*': rep = lup; break;
 			default: fprintf(stderr, "Unknown format '%c' (%d)\n", up, up);
 			}

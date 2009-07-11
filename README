@@ -8,18 +8,18 @@ external applications trying to keep the source as small as possible.
 COMMANDS
 ========
 
-? is for help
-x hexdump
-X dword dump   (32bit hex values?)
-o octdump
+? is for help   get help or evaluate numeric expression
+x hexdump       hexdump
+X dword dump    hexpair dump
 > file          dump current block to file
 < file          slurp file into current block
 w "string\x00"  write string
 w 023839400     write hexpairs
 b 30            set block size
 s addr          seek address
-o open          allow to open file number # or named
-                no arguments show all files in argv
+r [size|-rmv]   get filesize, truncate file to size, or -remove bytes
+p [bwWdDqQiIF.] print formatted the current block
+q               quit
 
 
 WORK IN PROGRESS
@@ -36,19 +36,12 @@ print command
 TODO:
 =====
 - support for escapped characters in string write and search ops
-- resize command
   r/d : resize or delete N bytes (d 128@:999) must truncate if possible
 - Add support for simple math ops (+,-,*,/) no parenthesis plz :)
 
 TODO/TOTHINK
 ============
 - Remove '.' command? do it suckless
-- filesize support
-- endian support
-- dump in hex like in gdb's x/x
-- flags (implement basic 'f' command to flag) usable from seek
-  - better to use flags defined on a file, and use grep and
-    so on to retrieve them?
 
 
 --pancake

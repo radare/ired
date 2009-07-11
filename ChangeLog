@@ -1,0 +1,368 @@
+== release 0.1
+
+changeset:   36:ba4108a3c6d5
+tag:         tip
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 16:28:35 2009 +0000
+files:       cmd.c
+description:
+* Fix gcc warning. Release 0.1
+
+
+changeset:   35:a69c81ce6b79
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 16:15:18 2009 +0000
+files:       Makefile
+description:
+* Use CFLAGS when compiling
+
+
+changeset:   34:d3c02ddef876
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 16:14:37 2009 +0000
+files:       cmd.c
+description:
+* Fix '!' command segfault
+  - Initialize buf in search command
+
+
+changeset:   33:cd894a746246
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 13:58:12 2009 +0000
+files:       util.c
+description:
+* Use 'isascii' instead of buf[0] for pz and pZ
+
+
+changeset:   32:795733b782ee
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 13:41:51 2009 +0000
+files:       io.c red.h
+description:
+* Full implementation of the w32 IO API
+
+
+changeset:   31:af7a10ccfed7
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 13:20:11 2009 +0000
+files:       Makefile red.h
+description:
+* First build for w32
+  - Added 'make w32'
+  - TODO: Use w32 IO API instead of posix by default on w32
+
+
+changeset:   30:23d74ef2b61b
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 13:09:01 2009 +0000
+files:       README
+description:
+* Some minor changes in README
+
+
+changeset:   29:f46469969239
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 13:02:59 2009 +0000
+files:       Makefile util.c
+description:
+* Added support for 'K' 'M' and 'G' suffix in str2ull function
+  - Added support for octal input (start with '0')
+  - po command shows in the same octal way ('0' prefix)
+* Fix hexstr2bin with spaces
+* Do not make loc vired
+
+
+changeset:   28:bdcc2e8cfb90
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 10:58:28 2009 +0000
+files:       cmd.c
+description:
+* Some code review and simplification -10LOC
+
+
+changeset:   27:b944c1a84437
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 10:54:29 2009 +0000
+files:       README red.c
+description:
+* Minor fix in README
+* Remove end '.' in error message
+
+
+changeset:   26:26582b52ed09
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 10:52:13 2009 +0000
+files:       util.c
+description:
+* Fix build
+
+
+changeset:   25:05b4d6b61a48
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 10:50:22 2009 +0000
+files:       README
+description:
+* Fix README
+
+
+changeset:   24:ef1a2671bbc6
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 10:47:11 2009 +0000
+files:       cmd.c io.c red.c util.c
+description:
+* hexdump() now gets a 3rd argument to set the width
+* Show filesize when no args given to 'r' command
+  - Truncate file when removing bytes (f.ex: r-10)
+* Fix segfault in cmd_system() when no BLOCK is used, but [X]OFFSET is
+* skipspaces() is now skipping 'all' spaces, not only the first one
+* Some code cleanup (-5 LOC) - now is 499 LOC :P
+
+
+changeset:   23:4f672b5b67b9
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 01:26:54 2009 +0000
+files:       cmd.c vired
+description:
+* Fix segfault coz an uninitialized variable
+* 'r' with no argument should return filesize
+  - not implemented
+
+
+changeset:   22:0b6a9d1bcae2
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 01:20:51 2009 +0000
+files:       Makefile cmd.c io.c red.c vired
+description:
+* Add command 'r' to resize and remove bytes
+  r128  : truncate file to 128 bytes
+  r-10  : remove 10 bytes from current seek
+* Added io_truncate
+* warning: 500LOC reached :)
+
+
+changeset:   21:1de30455d1c5
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 00:34:57 2009 +0000
+files:       red.c
+description:
+* Simplify argv parsing (-1 LOC)
+
+
+changeset:   20:d37eb8dbb125
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 00:27:02 2009 +0000
+files:       cmd.c red.c util.c
+description:
+* Add '?' in help message
+* Simplify and add more checks in cmd_system()
+  - setenv FILE once
+* Simplify code for parsing arguments
+  - Minor simplification in hexstr2raw
+
+
+changeset:   19:f455f21e48f9
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 00:07:45 2009 +0000
+files:       Makefile cmd.c red.c util.c
+description:
+* Code cleanup (-18 LOC)
+  - Move print_fmt stuff into utils.c
+* Use static in more functions
+
+
+changeset:   18:de171facddfb
+user:        pancake@localhost.localdomain
+date:        Fri Jul 10 23:43:24 2009 +0000
+files:       Makefile cmd.c
+description:
+* Fix some valgrind warnings in the print format command
+  - Some uninitialized variable usage
+  - Out of buffer reads are now controlled
+  - repeat last print format until the end of the block
+
+
+changeset:   17:48f165d7837a
+user:        pancake@localhost.localdomain
+date:        Fri Jul 10 23:22:23 2009 +0000
+files:       cmd.c util.c vired
+description:
+* Set vired block size to 256
+  - Set P='' to avoid env interference
+* Do not overwrite bsize
+
+
+changeset:   16:edef8bd2b6ca
+user:        pancake@localhost.localdomain
+date:        Fri Jul 10 20:41:16 2009 +0000
+files:       README cmd.c red.c
+description:
+* Initial implementation of the 'p' command to print
+  current block as a formatted buffer ('p' for help)
+* Add 'X' command in the help message
+* Do not parse '@' if ! is used
+
+
+changeset:   15:7097e08566c4
+user:        pancake@flubox
+date:        Fri Jul 10 20:00:12 2009 +0200
+files:       util.c vired
+description:
+* Added support for 's+b' and 's-b'
+
+
+changeset:   14:1c28afb4af0b
+user:        pancake@flubox
+date:        Fri Jul 10 19:54:26 2009 +0200
+files:       README cmd.c
+description:
+* Define new 'p' command in README
+* Fix help message for 'w' command
+
+
+changeset:   13:963aaffb26b7
+user:        pancake@flubox
+date:        Fri Jul 10 18:40:27 2009 +0200
+files:       cmd.c
+description:
+* Fix obsize in cmd_bsize()
+
+
+changeset:   12:fc86586c1084
+user:        pancake@flubox
+date:        Fri Jul 10 18:29:30 2009 +0200
+files:       cmd.c red.c util.c
+description:
+* Split hexdump() in util.c
+* Added support for ':' syntax for temporal blocksize
+* Added '-' for slurping stdin like hexdump -C
+
+
+changeset:   11:dff8083d3b66
+user:        pancake@flubox
+date:        Fri Jul 10 18:10:09 2009 +0200
+files:       cmd.c util.c
+description:
+* Fix end-of-file and out-of-file IO reads
+  -2 LOC :)
+
+
+changeset:   10:0ef965f1cd6b
+user:        pancake@flubox
+date:        Tue Jul 07 18:28:24 2009 +0200
+files:       README cmd.c red.c util.c
+description:
+* Use ut64 and ut8 instead of ull and uc8
+  - More consistent type names. radare and libr must change this too
+
+
+changeset:   9:ce9c10de16dd
+user:        pancake@flubox
+date:        Tue Jul 07 18:00:01 2009 +0200
+files:       io.c red.c util.c
+description:
+* Use oneliner switch statements for single ops
+  - Safe -29 LOC
+* Fix previous commit (broken build)
+* Internal io fd has been renamed to fix a bug
+
+
+changeset:   8:5ff3f119598c
+user:        pancake@flubox
+date:        Tue Jul 07 17:49:35 2009 +0200
+files:       io.c
+description:
+* io layer rewritten as cpp macros
+  - earn -23LOC
+
+
+changeset:   7:f3d9af189f4c
+user:        pancake@flubox
+date:        Tue Jul 07 11:53:45 2009 +0200
+files:       vired
+description:
+* Do not use 'read -n' coz is posix shell
+
+
+changeset:   6:e9dd080db646
+user:        pancake@localhost.localdomain
+date:        Tue Jul 07 09:41:52 2009 +0000
+files:       README cmd.c io.c red.c util.c vired
+description:
+* Added '>' and '<' command to dump and load bytes
+  from/to files and current block
+* Added '.' command to interpret files
+* Fix vired for iphoneos (no /dev/stderr, only /dev/tty)
+* Some code simplification (reduced some LOCs)
+
+
+changeset:   5:62eeb4806234
+user:        pancake@localhost.localdomain
+date:        Mon Jul 06 10:11:34 2009 +0000
+files:       cmd.c red.c vired
+description:
+* Implement '/' search command for hex and strings
+* Export OFFSET, XOFFSET, FILE and BLOCK environment
+  to the system '!' command
+* Rename '-s' to '-n'
+* Make vired self-sufficient
+  - 'p' toggles between hexa and disasm (using rasm2 -d -)
+  - Added 'b' key to change block size
+  - '?' key show help
+
+
+changeset:   4:3aec8e4c3367
+user:        pancake@localhost.localdomain
+date:        Sun Jul 05 23:33:51 2009 +0000
+files:       Makefile cmd.c io.c red.c vired
+description:
+* Initial import of 'vired'
+  - The shellscript implementation of the visual mode for 'red'
+* Added support to relative change the block size
+* Added '!' command to run shell commands
+* Added 'X' command to print curblock as hexpairs
+
+
+changeset:   3:d81b7e09cbce
+user:        pancake@localhost.localdomain
+date:        Sun Jul 05 22:49:48 2009 +0000
+files:       cmd.c io.c red.c red.h util.c
+description:
+* Abstract io stuff in io.c
+* 's' command displays curseek when no arg given
+  - s+ and s- are used to do relative seeks
+* Fix 64 bit hexa parsing
+* 256 bytes as default block size
+
+
+changeset:   2:0081ce1e5731
+user:        pancake@localhost.localdomain
+date:        Sat Jul 04 20:42:27 2009 +0000
+files:       Makefile cmd.c red.c util.c
+description:
+* Implement 'w' command to write hexpairs and strings
+* Fix hexdump for short buffers
+* Added help message and flags for the shell
+  -h for help
+  -i [file] interpret file
+  -s silent
+  -v version
+
+
+changeset:   1:75196ad1be66
+user:        pancake@localhost.localdomain
+date:        Fri Jul 03 20:12:28 2009 +0000
+files:       Makefile red.c
+description:
+* Add install target.
+* Fix 0arg run
+
+
+changeset:   0:ed796be9f25e
+user:        pancake@flubox
+date:        Fri Jul 03 20:11:24 2009 +0200
+files:       Makefile README cmd.c red.c red.h util.c
+description:
+* Initial import of 'red' the raw editor
+  - A minimalistic implementation of the radare shell
+
+

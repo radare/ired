@@ -1,9 +1,13 @@
 CC?=gcc
-CFLAGS+=-Wall -g
+CCw32?=i486-mingw32-gcc
+CFLAGS+=-Wall -O2
 PREFIX?=/usr
 
-all: clean red.o
-	${CC} red.o -o red
+all:
+	${CC} red.c -o red
+
+w32:
+	${CCw32} red.c -o red.exe
 
 loc:
 	@wc -l *.c *.h | grep total

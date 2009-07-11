@@ -10,13 +10,13 @@ static void cmd_hexdump(char *arg) {
 }
 
 static void cmd_print(char *arg) {
-	unsigned char *buf, *obuf;
+	unsigned char *buf;
 	unsigned int len = bsize;
 	if (*arg) {
-		obuf = buf = getcurblk(arg, &len);
-		if (buf != NULL)
-			print_fmt(buf, arg, len);
-		free(obuf);
+		buf = getcurblk(arg, &len);
+		if (!buf) return;
+		print_fmt(buf, arg, len);
+		free(buf);
 	} else printf(
 		"ob/wW/dD/qQ  byte (oct,hex), word, dword, qword (little, big endian)\n"
 		"i/I/f/F      int32 (lil, big), float (lil, big)\n"
@@ -47,8 +47,7 @@ void cmd_search(char *arg) {
 	buf = getcurblk("", &len);
 	do {
 		for(i=0;i<bsize;i++) {
-			if (arg[hit++]!=buf[i])
-				hit = 0;
+			if (arg[hit++]!=buf[i]) hit = 0;
 			else if (hit == len)
 				printf("0x%llx\n", seek+i-len+1);
 		}
@@ -58,25 +57,18 @@ void cmd_search(char *arg) {
 }
 
 static void cmd_bsize(char *arg) {
-	if (!*arg)
-		printf("%d\n", bsize);
-	else if (*arg=='+')
-		bsize += (int)str2ut64(arg+1);
-	else if (*arg=='-')
-		bsize -= (int)str2ut64(arg+1);
+	if (!*arg) printf("%d\n", bsize);
+	else if (*arg=='+') bsize += (int)str2ut64(arg+1);
+	else if (*arg=='-') bsize -= (int)str2ut64(arg+1);
 	else bsize = str2ut64(arg);
-	if (bsize<1)
-		bsize = 1;
+	if (bsize<1) bsize = 1;
 	obsize = bsize;
 }
 
 static void cmd_seek(char *arg) {
-	if (!*arg)
-		printf("%lld\n", seek);
-	else if (*arg=='+')
-		oseek = seek += str2ut64(arg+1);
-	else if (*arg=='-')
-		oseek = seek -= str2ut64(arg+1);
+	if (!*arg) printf("%lld\n", seek);
+	else if (*arg=='+') oseek = seek += str2ut64(arg+1);
+	else if (*arg=='-') oseek = seek -= str2ut64(arg+1);
 	else oseek = seek = str2ut64(arg);
 }
 
@@ -91,13 +83,11 @@ static void cmd_dump(char *file) {
 
 static void cmd_load(char *file) {
 	void *buf;
-	unsigned int len = bsize;
 	FILE *fd = fopen(file, "rb");
 	if (!fd) return;
 	buf = malloc(bsize);
 	if (!buf) return;
-	len = fread(buf, 1, len, fd);
-	io_write(buf, len);
+	io_write(buf, fread(buf, 1, bsize, fd));
 	fclose(fd);
 	free(buf);
 }

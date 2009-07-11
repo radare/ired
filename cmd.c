@@ -36,7 +36,7 @@ static void cmd_bytedump(char *arg) {
 }
 
 void cmd_search(char *arg) {
-	unsigned char *buf;
+	unsigned char *buf = NULL;
 	unsigned int i, len, hit=0;
 	arg = skipspaces(arg);
 	if (*arg=='"') {
@@ -44,7 +44,7 @@ void cmd_search(char *arg) {
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-	buf = getcurblk("", &len);
+	if (buf = getcurblk("", &len))
 	do {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i]) hit = 0;
@@ -147,7 +147,7 @@ static void cmd_resize(char *arg) {
 
 static void cmd_system(char *arg) {
 	unsigned int len = bsize;
-	char *buf, str[64];
+	char *buf = NULL, str[64];
 	if (strstr(arg, "BLOCK")) {
 		FILE *fd = fopen(".curblk", "w");
 		if (fd) {

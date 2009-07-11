@@ -4,10 +4,10 @@ CFLAGS+=-Wall -O2
 PREFIX?=/usr
 
 all:
-	${CC} red.c -o red
+	${CC} ${CFLAGS} red.c -o red
 
 w32:
-	${CCw32} red.c -o red.exe
+	${CCw32} ${CFLAGS} red.c -o red.exe
 
 loc:
 	@wc -l *.c *.h | grep total

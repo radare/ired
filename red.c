@@ -7,9 +7,36 @@ static int verbose = 1;
 static char *script = 0;
 static ut64 oseek, seek = 0LL;
 static unsigned int obsize, bsize = 256;
-static char *red_interpret(char *file); // XXX
+static int red_cmd(char *cmd); // XXX : recursive depenency
 
 #include "red.h"
+
+int red_slurpin() {
+	int len;
+	unsigned char buf[4096];
+	for(;;) {
+		len = read(0, buf, 4096);
+		if (len<1) break;
+		hexdump(buf, len);
+		seek += len;
+	}
+	return 0;
+}
+
+static char *red_interpret(char *file) {
+	char buf[1024];
+	FILE *fh = fopen(file, "r");
+	if (fh != NULL) {
+		file = NULL;
+		for(;;) {
+			fgets(buf, 1023, fh);
+			if (feof(fh)) break;
+			red_cmd(buf);
+		}
+		fclose(fh);
+	} else fprintf(stderr, "Cannot open script file '%s'\n", file);
+	return file;
+}
 
 static int red_cmd(char *cmd) {
 	switch(*cmd) {
@@ -58,37 +85,8 @@ static int red_prompt() {
 	return red_cmd(skipspaces(line));
 }
 
-int red_slurpin() {
-	int len;
-	unsigned char buf[1024];
-	for(;;) {
-		len = read(0, buf, 1024);
-		if (len<1)
-			break;
-		hexdump(buf, len);
-		seek+=len;
-	}
-	return 0;
-}
-
-static char *red_interpret(char *file) {
-	char buf[1024];
-	FILE *fh = fopen(file, "r");
-	if (fh == NULL) {
-		fprintf(stderr, "Cannot open script file '%s'\n", file);
-		return file;
-	}
-	for(;;) {
-		fgets(buf, 1023, fh);
-		if (feof(fh))
-			break;
-		red_cmd(buf);
-	}
-	fclose(fh);
-	return NULL;
-}
-
 static void red_open(char *file) {
+	oseek = 0;
 	if (io_open(file) != -1) {
 		if (script)
 			script = red_interpret(script);

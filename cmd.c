@@ -52,7 +52,7 @@ void cmd_search(char *arg) {
 				printf("0x%llx\n", seek+i-len+1);
 		}
 		seek+=bsize;
-	} while(io_read(buf, bsize)>0);
+	} while(io_read(buf, len)>0);
 	free(buf);
 }
 

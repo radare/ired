@@ -44,15 +44,15 @@ void cmd_search(char *arg) {
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-	if ((buf = getcurblk("", &len)))
+	if ((buf = getcurblk("", &bsize)))
 	do {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i]) hit = 0;
 			else if (hit == len)
 				printf("0x%llx\n", seek+i-len+1);
 		}
-		seek+=bsize;
-	} while(io_read(buf, len)>0);
+		seek += bsize;
+	} while(io_read(buf, bsize)>0);
 	free(buf);
 }
 

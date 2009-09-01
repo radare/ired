@@ -1,5 +1,50 @@
 == release 0.2
 
+changeset:   41:6fd885d7d0c2
+tag:         tip
+user:        pancake@localhost.localdomain
+date:        Tue Sep 01 22:30:01 2009 +0000
+files:       ChangeLog Makefile cmd.c ired.1 vired vired.1
+description:
+* Add manpages for ired and vired
+* Compile with debugging information by default
+* Added 'make dist' target
+* Fix double free in cmd.c
+* Fix disassemble mode in 'p' key of vired
+
+
+changeset:   40:97b4743c4dc6
+user:        pancake@localhost.localdomain
+date:        Tue Sep 01 21:17:05 2009 +0000
+files:       Makefile ired.c red.c
+description:
+* Rename from red to ired to avoid program name collisions
+
+
+changeset:   39:03da6e158902
+user:        pancake@flubox
+date:        Fri Jul 17 11:47:55 2009 +0200
+files:       Makefile cmd.c
+description:
+* Fix search command. Oops :)
+
+
+changeset:   38:1715fc1d195e
+user:        pancake@localhost.localdomain
+date:        Sun Jul 12 01:22:15 2009 +0000
+files:       cmd.c
+description:
+* Fix segfault in cmd_search()
+
+
+changeset:   37:8ff91ac81732
+user:        pancake@localhost.localdomain
+date:        Sat Jul 11 16:31:06 2009 +0000
+files:       ChangeLog red.h
+description:
+* Bump revision number to 0.2
+
+
 == release 0.1
 
 changeset:   36:ba4108a3c6d5

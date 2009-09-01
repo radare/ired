@@ -1,6 +1,6 @@
 CC?=gcc
 CCw32?=i486-mingw32-gcc
-CFLAGS+=-O2 -g
+CFLAGS+=-O2
 PREFIX?=/usr
 
 all:

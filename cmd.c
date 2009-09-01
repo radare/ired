@@ -18,7 +18,7 @@ static void cmd_print(char *arg) {
 		print_fmt(buf, arg, len);
 		free(buf);
 	} else printf(
-		"ob/wW/dD/qQ  byte (oct,hex), word, dword, qword (little, big endian)\n"
+		"ob/wW/dD/qQ  byte (oct,hex), word, dword, qword (lil, big endian)\n"
 		"i/I/f/F      int32 (lil, big), float (lil, big)\n"
 		"s/S          short int16 (lil, big)\n"
 		"z/Z          zero-terminatted string (ascii, wide-ascii)\n"
@@ -157,6 +157,7 @@ static void cmd_system(char *arg) {
 				fwrite(buf, len, 1, fd);
 				fclose(fd);
 				free(buf);
+				buf = NULL;
 			}
 		}
 	}

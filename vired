@@ -3,7 +3,7 @@
 # copyleft: pancake at nopcode dot org @ 2009
 
 if [ -n "$1" ]; then
-  $0 | red -n $@
+  $0 | ired -n $@
   exit 0
 fi
 
@@ -22,7 +22,7 @@ echo "b 256"
 while : ; do
   echo "!clear"
   case $P in
-  'd') echo '!echo X | red -s $BLOCK | rasm2 -o $OFFSET -d -' ;;
+  'd') echo '!echo X | ired -n $BLOCK | rasm2 -o $OFFSET -d -' ;;
   *)   echo x ;;
   esac
   A=`dd if=/dev/tty count=1 bs=1 2>/dev/null`

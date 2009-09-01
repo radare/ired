@@ -1,0 +1,115 @@
+.Dd Sep 1, 2009
+.Dt IRED 1
+.Os
+.Th IRED 1
+.Sh NAME
+ired \- interactive raw editor
+.Sh SYNOPSIS
+.Nm ired
+.Op Fl hnv
+.Op Fl i Ar script
+.Ar file ...
+.Sh DESCRIPTION
+Simple and minimal hexadecimal editor based on radare concepts
+.Pp
+The program arguments are:
+.Pp
+.Bl -tag -width Fl
+.It Fl h
+Show help message
+.It Fl v
+Show version information
+.It Fl n
+Do not be verbose
+.It Fl i Ar script
+Interpret a script file as ired commands.
+.Pp
+Same as "ired file < script"
+.El
+.PP
+.Sh COMMANDS
+.Pp
+.Bl -tag -width Fl
+.It s[+-addr] 
+seek to relative or absolute address
+.Pp
+> s 0x400  # seek to offset 0x400
+.Pp
+> s+20     # seek 20 bytes forward
+.It b[+-size] 
+change block size
+.Pp
+> b 5      # set block size to 5 bytes
+.Pp
+> b +128   # increase block size in 128 bytes
+.It w[hex|"str"]
+write hexpair or string
+.Pp
+> w 001122       # write 0x00 0x11 0x22
+.Pp
+> w"Hello World" # write "Hello World" string without quotes
+.It /[hex|"str"]
+search hexpair or string
+.Pp
+> /894722       # search bytes 0x89 0x47 0x22
+.Pp
+> /"lib"        # search string 'lib'
+.It x[size]
+hexdump
+.Pp
+> x 256    # dump 256 bytes in hexadecimal
+.It X[size]
+hexpair dump
+.Pp
+> X 0x100  # dump 256 bytes in hexpairs
+.It p[fmt]
+print formatted current block ('p' for help)
+.Pp
+ob/wW/dD/qQ  byte (oct,hex), word, dword, qword (lil, big endian)
+.Pp
+i/I/f/F      int32 (lil, big), float (lil, big)
+.Pp
+s/S          short int16 (lil, big)
+.Pp
+z/Z          zero-terminatted string (ascii, wide-ascii)
+.Pp
+./:/*        skip 1 or 4 chars, repeat last format instead of cycle
+.It r[-[num]]
+truncate or -remove N bytes
+.Pp
+> r 1024   # resize file to 1024 bytes
+.Pp
+> r-10     # remove 10 bytes from current seek and shrink file
+.It .[file]
+interpret file
+.Pp
+> .script # run file 'script'
+.It <[file]
+load file in current seek
+.Pp
+> <curblock.bin  # load blocksize bytes from file
+.It >[file]
+dump current block to file
+.Pp
+> >curblock.bin  # dump current block to a file
+.It !cmd
+run shell command
+.Pp
+> !cp $BLOCK $FILE.curblock # save current block
+.It ?expr
+calculate numeric expression
+.Pp
+> ?1024
+.Pp
+0x400 1024 02000
+
+.It q
+quit
+
+.El
+.Sh SEE ALSO
+.Pp
+.Xr vired(1)
+.Sh AUTHORS
+.PP
+pancake <@nopcode.org>

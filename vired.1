@@ -1,0 +1,39 @@
+.Dd Sep 1, 2009
+.Dt VIRED 1
+.Os
+.Th VIRED 1
+.Sh NAME
+vired \- visual interactive raw editor
+.Sh SYNOPSIS
+.Nm vired
+.Ar file
+.Sh DESCRIPTION
+Visual mode for ired(1)
+.Pp
+.Sh KEYS
+.Bl -tag -width Fl
+.It hjkl
+seek left(-1), down(+16), up(-16), right(+1)
+.It +-*/
+change block size (+1,-1,+16,-16)
+.It :[cmd]
+input ired command
+.It b
+prompt to change block size
+.It s
+prompt seek address
+.It r
+prompt for resize, remove command
+.It p
+change print mode
+.It ?
+show help
+.It q
+quit program
+.Pp
+.Sh SEE ALSO
+.Pp
+.Xr ired(1)
+.Sh AUTHORS
+.PP
+pancake <@nopcode.org>

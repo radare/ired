@@ -4,17 +4,17 @@ CFLAGS+=-O2
 PREFIX?=/usr
 
 all:
-	${CC} ${CFLAGS} red.c -o red
+	${CC} ${CFLAGS} ired.c -o ired
 
 w32:
-	${CCw32} ${CFLAGS} red.c -o red.exe
+	${CCw32} ${CFLAGS} ired.c -o ired.exe
 
 loc:
 	@wc -l *.c *.h | grep total
 
 clean:
-	rm -f red red.o
+	rm -f ired ired.o
 
 install:
-	cp red ${PREFIX}/bin
+	cp ired ${PREFIX}/bin
 	cp vired ${PREFIX}/bin

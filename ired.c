@@ -40,6 +40,7 @@ static char *red_interpret(char *file) {
 
 static int red_cmd(char *cmd) {
 	switch(*cmd) {
+	case ';': case '#': break; // comment
 	case 'q': return 0;
 	case '>': cmd_dump(cmd+1); break;
 	case '<': cmd_load(cmd+1); break;
@@ -100,7 +101,7 @@ static void red_open(char *file) {
 }
 
 static int red_help() {
-	puts("red [-hnv] [-i script] [file] [..]");
+	puts("ired [-hnv] [-i script] [file] [..]");
 	return 0;
 }
 

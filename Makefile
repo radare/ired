@@ -2,6 +2,7 @@ CC?=gcc
 CCw32?=i486-mingw32-gcc
 CFLAGS+=-O2
 PREFIX?=/usr
+DESTDIR?=
 
 all:
 	${CC} ${CFLAGS} ired.c -o ired
@@ -23,7 +24,13 @@ clean:
 	rm -f ired ired.o
 
 install:
-	cp ired ${PREFIX}/bin
-	cp vired ${PREFIX}/bin
-	cp ired.1 ${PREFIX}/share/man/man1
-	cp vired.1 ${PREFIX}/share/man/man1
+	cp ired ${DESTDIR}${PREFIX}/bin
+	cp vired ${DESTDIR}${PREFIX}/bin
+	cp ired.1 ${DESTDIR}${PREFIX}/share/man/man1
+	cp vired.1 ${DESTDIR}${PREFIX}/share/man/man1
+
+uninstall:
+	rm -f ${DESTDIR}${PREFIX}/bin/ired
+	rm -f ${DESTDIR}${PREFIX}/bin/vired
+	rm -f ${DESTDIR}${PREFIX}/share/man/man1/ired.1
+	rm -f ${DESTDIR}${PREFIX}/share/man/man1/vired.1

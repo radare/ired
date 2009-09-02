@@ -52,6 +52,7 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 			case 'Z': for(i=0; inc<len && isascii(buf[0]);i++) { printf("%c", buf[0]); buf+=2; inc+=2; } if(i)printf("\n"); break;
 			case '*': rep = lup; break;
 			default: fprintf(stderr, "Unknown format '%c' (%d)\n", up, up);
+				return;
 			}
 			if (!rep) lup = up;
 			buf += inc;

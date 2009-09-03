@@ -1,6 +1,6 @@
 CC?=gcc
 CCw32?=i486-mingw32-gcc
-CFLAGS+=-O2
+CFLAGS+=-O2 -Wall
 PREFIX?=/usr
 DESTDIR?=
 

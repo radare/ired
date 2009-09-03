@@ -71,7 +71,7 @@ static ut64 str2ut64(char *str) {
 	else if (str[0]=='0') {
 		if (str[1]=='x') sscanf(str, "0x%llx", &ret);
 		else sscanf(str, "0x%llo", &ret);
-	} else sscanf(str, "%lld", &ret);
+	} else sscanf(str, "%llu", &ret);
 	str+=strlen(str)-1;
 	if (*str=='K') ret *= 1024;
 	else if (*str=='M') ret *= 1024*1024;

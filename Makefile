@@ -24,8 +24,10 @@ clean:
 	rm -f ired ired.o
 
 install:
+	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp ired ${DESTDIR}${PREFIX}/bin
 	cp vired ${DESTDIR}${PREFIX}/bin
+	mkdir -p ${DESTDIR}${PREFIX}/share/man/man1
 	cp ired.1 ${DESTDIR}${PREFIX}/share/man/man1
 	cp vired.1 ${DESTDIR}${PREFIX}/share/man/man1
 

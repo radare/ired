@@ -36,7 +36,7 @@ static void cmd_bytedump(char *arg) {
 }
 
 void cmd_search(char *arg) {
-	unsigned char *buf = NULL;
+	unsigned char *buf;
 	unsigned int i, len, hit=0;
 	arg = skipspaces(arg);
 	if (*arg=='"') {
@@ -49,9 +49,9 @@ void cmd_search(char *arg) {
 		for(i=0;i<bsize;i++) {
 			if (arg[hit++]!=buf[i]) hit = 0;
 			else if (hit == len)
-				printf("0x%llx\n", seek+i-len+1);
+				printf("0x%"LLF"x\n", curseek+i-len+1);
 		}
-		seek += bsize;
+		curseek += bsize;
 	} while(io_read(buf, bsize)>0);
 	free(buf);
 }
@@ -66,28 +66,35 @@ static void cmd_bsize(char *arg) {
 }
 
 static void cmd_seek(char *arg) {
-	if (!*arg) printf("%lld\n", seek);
-	else if (*arg=='+') oseek = seek += str2ut64(arg+1);
-	else if (*arg=='-') oseek = seek -= str2ut64(arg+1);
-	else oseek = seek = str2ut64(arg);
+	if (!*arg) printf("%"LLF"d\n", curseek);
+	else if (*arg=='+') curseek += str2ut64(arg+1);
+	else if (*arg=='-') curseek -= str2ut64(arg+1);
+	else curseek = str2ut64(arg);
+	oldseek = curseek;
 }
 
 static void cmd_dump(char *file) {
 	unsigned int len = bsize;
 	void *buf = getcurblk("", &len);
 	FILE *fd = fopen(file, "wb");
-	fwrite(buf, len, 1, fd);
+	if (fwrite(buf, len, 1, fd)<len)
+		perror("fwrite");
 	fclose(fd);
 	free(buf);
 }
 
 static void cmd_load(char *file) {
+	int len;
 	void *buf;
 	FILE *fd = fopen(file, "rb");
 	if (!fd) return;
 	buf = malloc(bsize);
 	if (!buf) return;
-	io_write(buf, fread(buf, 1, bsize, fd));
+	len = fread(buf, 1, bsize, fd);
+	if (len<bsize)
+		perror("fread");
+	if (io_write(buf, len)<len)
+		perror("io_write");
 	fclose(fd);
 	free(buf);
 }
@@ -100,14 +107,15 @@ static void cmd_write(char *arg) {
 		len = strlen(arg)-1;
 		arg[len]='\0';
 	} else len = hexstr2raw(arg);
-	io_seek(seek, SEEK_SET);
-	io_write(arg, len);
+	io_seek(curseek, SEEK_SET);
+	if (io_write(arg, len)<len)
+		perror("io_write");
 }
 
 static void cmd_help(char *arg) {
 	if (*arg) {
 		ut64 ret = str2ut64(arg);
-		printf("0x%llx %lld 0%llo\n", ret, ret, ret);
+		printf("0x%"LLF"x %"LLF"d 0%"LLF"o\n", ret, ret, ret);
 	} else printf(
 	"s[+-addr]     seek to relative or absolute address\n"
 	"b[+-size]     change block size\n"
@@ -127,22 +135,26 @@ static void cmd_help(char *arg) {
 
 static void cmd_resize(char *arg) {
 	unsigned int len;
-	if (!*arg) printf("%lld\n", io_seek(0, SEEK_END));
+	int ret = 0;
+	if (!*arg) printf("%"LLF"d\n", (long long int)io_seek(0, SEEK_END));
 	else if (*arg=='-') {
 		ut8 *buf = malloc(bsize);
-		ut64 i, n = str2ut64(arg+1);
 		if (buf) {
+			ut64 i, n = str2ut64(arg+1);
 			for(i=0;;i+=len) {
-				io_seek(seek+n+i, SEEK_SET);
+				io_seek(curseek+n+i, SEEK_SET);
 				len = io_read(buf, bsize);
 				if (len<1) break;
-				io_seek(seek+i, SEEK_SET);
-				io_write(buf, len);
+				io_seek(curseek+i, SEEK_SET);
+				if (io_write(buf, len)<len)
+					perror("io_write");
 			}
 			free(buf);
+			ret = io_truncate(io_seek(0, SEEK_END)-n);
 		}
-		io_truncate(io_seek(0, SEEK_END)-n);
-	} else io_truncate(str2ut64(arg));
+	} else ret = io_truncate(str2ut64(arg));
+	if (ret<0)
+		perror("truncate");
 }
 
 static void cmd_system(char *arg) {
@@ -154,7 +166,8 @@ static void cmd_system(char *arg) {
 			buf = getcurblk("", &len);
 			if (buf) {
 				setenv("BLOCK", ".curblk", 1);
-				fwrite(buf, len, 1, fd);
+				if (fwrite(buf, len, 1, fd)<len)
+					perror("fwrite");
 				fclose(fd);
 				free(buf);
 				buf = NULL;
@@ -162,14 +175,15 @@ static void cmd_system(char *arg) {
 		}
 	}
 	if (strstr(arg, "OFFSET")) {
-		sprintf(str, "%lld", seek);
+		sprintf(str, "%"LLF"d", curseek);
 		setenv("OFFSET", str, 1); // XXX
 	}
 	if (strstr(arg, "XOFFSET")) {
-		sprintf(str, "0x%llx", seek);
+		sprintf(str, "0x%"LLF"x", curseek);
 		setenv("XOFFSET", str, 1); // XXX
 	}
-	io_system(arg);
+	if (io_system(arg)<0)
+		perror("system");
 	unlink(".curblk");
 	free(buf);
 }

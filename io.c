@@ -1,11 +1,7 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
-#define _FILE_OFFSET_BITS 64
-#define _GNU_SOURCE
+#include <sys/types.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <stdlib.h>
-
 #if __WIN32__
 #include <windows.h>
 static HANDLE _fd = NULL;
@@ -27,9 +23,13 @@ static int io_read(void *x, int y) {
 #define io_seek(x,y) SetFilePointer(_fd,x,0,!y?FILE_BEGIN:y==1?FILE_CURRENT:FILE_END)
 #define io_close() CloseHandle(_fd)
 #define io_system(x) system(x)
-#define io_truncate(x) { io_seek(x,SEEK_SET); SetEndOfFile(_fd); }
+#define io_truncate(x) 0; { io_seek(x,SEEK_SET); SetEndOfFile(_fd); }
 
 #else
+
+#define _FILE_OFFSET_BITS 64
+#define _GNU_SOURCE
+#include <fcntl.h>
 static int _fd = -1;
 static inline int io_open(char *file) {
 	_fd = open(file, O_RDWR|O_CREAT, 0644);

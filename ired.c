@@ -5,7 +5,7 @@
 
 static int verbose = 1;
 static char *script = 0;
-static ut64 oseek, seek = 0LL;
+static ut64 oldseek, curseek = 0LL;
 static unsigned int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
 
@@ -18,7 +18,7 @@ int red_slurpin() {
 		len = read(0, buf, 4096);
 		if (len<1) break;
 		hexdump(buf, len, 16);
-		seek += len;
+		curseek += len;
 	}
 	return 0;
 }
@@ -29,8 +29,8 @@ static char *red_interpret(char *file) {
 	if (fd != NULL) {
 		file = NULL;
 		for(;;) {
-			fgets(buf, 1023, fd);
-			if (feof(fd)) break;
+			if (fgets(buf, 1023, fd) == NULL)
+				break;
 			red_cmd(buf);
 		}
 		fclose(fd);
@@ -63,15 +63,15 @@ static int red_cmd(char *cmd) {
 static int red_prompt() {
 	char *at, *at2, line[4096];
 	if (verbose) {
-		printf("[0x%08llx]> ", seek);
+		printf("[0x%08"LLF"x]> ", curseek);
 		fflush(stdout);
 	}
-	fgets(line, 4095, stdin);
-	if (feof(stdin)) return 0;
+	if (fgets(line, 4095, stdin) == NULL)
+		return 0;
 	line[strlen(line)-1] = 0;
 	if (line[0] != '!') {
 		at = strchr(line, '@');
-		oseek = seek;
+		oldseek = curseek;
 		obsize = bsize;
 		if (at) {
 			*at = 0; at++;
@@ -80,20 +80,20 @@ static int red_prompt() {
 				*at2 = 0; at2++;
 				if (*at2) bsize = (int)str2ut64(at2);
 			}
-			if (*at) seek = str2ut64(at);
+			if (*at) curseek = str2ut64(at);
 		}
 	}
 	return red_cmd(skipspaces(line));
 }
 
 static void red_open(char *file) {
-	oseek = 0;
+	oldseek = 0;
 	setenv("FILE", file, 1);
 	if (io_open(file) != -1) {
 		if (script)
 			script = red_interpret(script);
 		while(red_prompt()) {
-			seek = oseek;
+			curseek = oldseek;
 			bsize = obsize;
 		}
 		io_close();

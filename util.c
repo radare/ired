@@ -1,5 +1,7 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
+#include <ctype.h>
+
 static inline char *skipspaces(char *arg) {
 	while (*arg==' '||*arg=='\t') arg++;
 	return arg;
@@ -8,7 +10,7 @@ static inline char *skipspaces(char *arg) {
 static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	unsigned int i, j;
 	for(i=0;i<len;i+=w) {
-		printf("0x%08llx ", seek+i);
+		printf("0x%08" LLF "x ", curseek+i);
 		for(j=i;j<i+w;j++) {
 			if (j>=len) {
 				printf(j%2?"   ":"  ");
@@ -69,9 +71,9 @@ static ut64 str2ut64(char *str) {
 	if (str[0]=='b'&&str[1]==0)
 		ret = bsize;
 	else if (str[0]=='0') {
-		if (str[1]=='x') sscanf(str, "0x%llx", &ret);
-		else sscanf(str, "0x%llo", &ret);
-	} else sscanf(str, "%llu", &ret);
+		if (str[1]=='x') sscanf(str, "0x%"LLF"x", &ret);
+		else sscanf(str, "0x%"LLF"o", &ret);
+	} else sscanf(str, "%"LLF"u", &ret);
 	str+=strlen(str)-1;
 	if (*str=='K') ret *= 1024;
 	else if (*str=='M') ret *= 1024*1024;
@@ -88,7 +90,7 @@ static int hex2byte(ut8 *val, ut8 c) {
 }
 
 static int hexstr2raw(char *arg) {
-	ut8 *ptr, c = 0, d = 0;
+	ut8 *ptr, c = 0, d;
 	unsigned int j = 0, len = 0;
 	for (ptr=(ut8 *)arg;*ptr;ptr++) {
 		if (*ptr==' ') continue;
@@ -112,7 +114,7 @@ static void *getcurblk(char *arg, unsigned int *len) {
 		if (*len <1) *len = bsize;
 	}
 	if ((buf = malloc(*len)) != NULL) {
-		if (io_seek(seek, SEEK_SET)<0) {
+		if (io_seek((int)curseek, SEEK_SET)<0) {
 			free(buf);
 			buf = NULL;
 		} else *len = io_read(buf, *len);

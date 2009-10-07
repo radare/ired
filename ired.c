@@ -6,28 +6,27 @@
 static int verbose = 1;
 static char *script = 0;
 static ut64 oldseek, curseek = 0LL;
-static unsigned int obsize, bsize = 256;
+static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
 
 #include "red.h"
+#include "util.c"
+#include "cmd.c"
 
-int red_slurpin() {
-	int len;
-	unsigned char buf[4096];
+static void red_slurpin() {
+	ut8 buf[4096];
 	for(;;) {
-		len = read(0, buf, 4096);
+		int len = read(0, buf, 4096);
 		if (len<1) break;
 		hexdump(buf, len, 16);
 		curseek += len;
 	}
-	return 0;
 }
 
-static char *red_interpret(char *file) {
+static void red_interpret(char *file) {
 	char buf[1024];
 	FILE *fd = fopen(file, "r");
 	if (fd != NULL) {
-		file = NULL;
 		for(;;) {
 			if (fgets(buf, 1023, fd) == NULL)
 				break;
@@ -35,13 +34,12 @@ static char *red_interpret(char *file) {
 		}
 		fclose(fd);
 	} else fprintf(stderr, "Cannot open script file '%s'\n", file);
-	return file;
 }
 
 static int red_cmd(char *cmd) {
 	switch(*cmd) {
-	case ';': case '#': break; // comment
 	case 'q': return 0;
+	case ';': case '#': break; // comment
 	case '>': cmd_dump(cmd+1); break;
 	case '<': cmd_load(cmd+1); break;
 	case '.': red_interpret(skipspaces(cmd+1)); break;
@@ -68,14 +66,14 @@ static int red_prompt() {
 	}
 	if (fgets(line, 4095, stdin) == NULL)
 		return 0;
-	line[strlen(line)-1] = 0;
-	if (line[0] != '!') {
+	line[strlen(line)-1] = '\0';
+	if (*line != '!') {
 		at = strchr(line, '@');
 		oldseek = curseek;
 		obsize = bsize;
 		if (at) {
-			*at = 0; at++;
-			at2 = strchr(at, ':');
+			*at = 0;
+			at2 = strchr(++at, ':');
 			if (at2) {
 				*at2 = 0; at2++;
 				if (*at2) bsize = (int)str2ut64(at2);
@@ -86,18 +84,20 @@ static int red_prompt() {
 	return red_cmd(skipspaces(line));
 }
 
-static void red_open(char *file) {
-	oldseek = 0;
-	setenv("FILE", file, 1);
-	if (io_open(file) != -1) {
+static int red_open(char *file) {
+	int ret = io_open(file);
+	if (ret != -1) {
+		oldseek = 0;
+		setenv("FILE", file, 1);
 		if (script)
-			script = red_interpret(script);
+			red_interpret(script);
 		while(red_prompt()) {
 			curseek = oldseek;
 			bsize = obsize;
 		}
 		io_close();
 	} else fprintf(stderr, "Cannot open '%s'\n", file);
+	return ret==-1 ?1:0;;
 }
 
 static int red_help() {
@@ -106,17 +106,17 @@ static int red_help() {
 }
 
 int main(int argc, char **argv) {
-	int i;
+	int i, ret = 1;
 	if (argc>1)
 	for(i=1;i<argc;i++) {
 		if (argv[i][0]=='-')
 			switch(argv[i][1]) {
 			case 'i': script = argv[++i]; break;
 			case 'n': verbose = 0; break;
-			case 'v': puts("red "VERSION" 2009"); return 0;
-			case 'h': return red_help();
-			case 0x0: return red_slurpin();
-		} else red_open(argv[i]);
-	} else return red_help();
-        return 0;
+			case 'v': puts("red "VERSION" 2009"); ret = 0; break;
+			case 'h': ret = red_help(); break;
+			case 0x0: red_slurpin(); ret = 0; break;
+		} else ret = red_open(argv[i]);
+	} else ret = red_help();
+        return ret;
 }

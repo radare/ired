@@ -1,4 +1,4 @@
-.Dd Sep 1, 2009
+.Dd Oct 7, 2009
 .Dt IRED 1
 .Os
 .Th IRED 1
@@ -95,7 +95,15 @@ dump current block to file
 .It !cmd
 run shell command
 .Pp
-> !cp $BLOCK $FILE.curblock # save current block
+The following environment variables are defined when found in the command string:
+.Pp
+FILE is the filename of the current working file
+.Pp
+BLOCK points to the temporal filename with the current block dump
+.Pp
+OFFSET and XOFFSET are decimal and hexadecimal values of the current seek
+.Pp
+> !cp $BLOCK $FILE-$XOFFSET.curblock # save current block
 .It ?expr
 calculate numeric expression
 .Pp

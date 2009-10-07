@@ -10,14 +10,13 @@ static inline char *skipspaces(char *arg) {
 static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	unsigned int i, j;
 	for(i=0;i<len;i+=w) {
-		printf("0x%08" LLF "x ", curseek+i);
+		printf("0x%08"LLF"x ", curseek+i);
 		for(j=i;j<i+w;j++) {
 			if (j>=len) {
 				printf(j%2?"   ":"  ");
 				continue;
 			}
-			printf("%02x", buf[j]);
-			if (j%2) printf(" ");
+			printf(j%2?"%02x ":"%02x", buf[j]);
 		}
 		for(j=i;j<i+w;j++) {
 			if (j>=len) printf(" ");
@@ -28,7 +27,7 @@ static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 }
 
 static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
-	unsigned int i, inc=0, lup=0, up, rep = 0;
+	unsigned int i, up, inc = 0, lup = 0, rep = 0;
 	char *ofmt = fmt;
 	do { /* TODO: needs cleanup */
 		for(;(*fmt||rep);fmt++) {
@@ -50,8 +49,8 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 				  buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]); inc=8; break;
 			case '.': inc=1; break;
 			case ':': inc=4; break;
-			case 'z': for(i=0; inc<len && isascii(buf[0]);i++) { printf("%c", buf[0]); buf++; inc++; } if(i)printf("\n"); break;
-			case 'Z': for(i=0; inc<len && isascii(buf[0]);i++) { printf("%c", buf[0]); buf+=2; inc+=2; } if(i)printf("\n"); break;
+			case 'z': for(i=0; inc<len && isascii(buf[0]);i++) { printf(i?"%c\n":"%c", buf[0]); buf++; } inc++; break;
+			case 'Z': for(i=0; inc<len && isascii(buf[0]);i++) { printf(i?"%c\n":"%c", buf[0]); buf+=2; } inc+=2; break;
 			case '*': rep = lup; break;
 			default: fprintf(stderr, "Unknown format '%c' (%d)\n", up, up);
 				return;
@@ -62,19 +61,19 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 			len -= inc;
 		}
 		fmt = ofmt;
-	} while(!rep && inc && inc <len);
+	} while(!rep && inc && inc<len);
 }
 
 static ut64 str2ut64(char *str) {
 	ut64 ret = 0LL;
 	str = skipspaces(str);
-	if (str[0]=='b'&&str[1]==0)
+	if (str[0]=='b'&&str[1]=='\0')
 		ret = bsize;
 	else if (str[0]=='0') {
 		if (str[1]=='x') sscanf(str, "0x%"LLF"x", &ret);
 		else sscanf(str, "0x%"LLF"o", &ret);
 	} else sscanf(str, "%"LLF"u", &ret);
-	str+=strlen(str)-1;
+	str += strlen(str)-1;
 	if (*str=='K') ret *= 1024;
 	else if (*str=='M') ret *= 1024*1024;
 	else if (*str=='G') ret *= 1024*1024*1024;
@@ -82,17 +81,17 @@ static ut64 str2ut64(char *str) {
 }
 
 static int hex2byte(ut8 *val, ut8 c) {
-	if ('0' <= c && c <= '9')      *val = (ut8)(*val) * 16 + ( c - '0');
+	if ('0' <= c && c <= '9') *val = (ut8)(*val) * 16 + ( c - '0');
 	else if (c >= 'A' && c <= 'F') *val = (ut8)(*val) * 16 + ( c - 'A' + 10);
 	else if (c >= 'a' && c <= 'f') *val = (ut8)(*val) * 16 + ( c - 'a' + 10);
 	else return 1;
 	return 0;
 }
 
-static int hexstr2raw(char *arg) {
-	ut8 *ptr, c = 0, d;
+static unsigned int hexstr2raw(char *arg) {
+	ut8 *ptr, d, c = 0;
 	unsigned int j = 0, len = 0;
-	for (ptr=(ut8 *)arg;*ptr;ptr++) {
+	for (ptr=(ut8 *)arg; *ptr; ptr++) {
 		if (*ptr==' ') continue;
 		d = c;
 		if (hex2byte(&c, *ptr))
@@ -107,13 +106,13 @@ static int hexstr2raw(char *arg) {
 	return len;
 }
 
-static void *getcurblk(char *arg, unsigned int *len) {
-	void *buf;
+static void *getcurblk(char *arg, int *len) {
+	void *buf = NULL;
 	if (*arg) {
 		*len = (int)str2ut64(arg);
-		if (*len <1) *len = bsize;
+		if (*len<1) *len = bsize;
 	}
-	if ((buf = malloc(*len)) != NULL) {
+	if (*len>0 && (buf = malloc(*len)) != NULL) {
 		if (io_seek((int)curseek, SEEK_SET)<0) {
 			free(buf);
 			buf = NULL;

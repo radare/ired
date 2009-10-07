@@ -1,5 +1,7 @@
-#define VERSION "0.3"
+#define VERSION "0.4"
 
+#include <unistd.h>
+#include <sys/types.h>
 #include "io.c"
 #include <stdio.h>
 #include <ctype.h>
@@ -8,16 +10,11 @@
 
 #if(plan9)
 static int setenv(char *var, char *val, int force) {
-	char str[128];
+	char str[256];
 	snprintf(str, sizeof(str), "echo %s > /env/%s", var, val);
-	if (system(str)<0)
-		perror("system");
-	return force;
+	return system(str);
 }
 #define LLF "L"
 #else
 #define LLF "ll"
 #endif
-
-#include "util.c"
-#include "cmd.c"

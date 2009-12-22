@@ -9,7 +9,7 @@ static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
 
-#include "red.h"
+#include "ired.h"
 #include "util.c"
 #include "cmd.c"
 

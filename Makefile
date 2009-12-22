@@ -1,14 +1,14 @@
 CC?=gcc
 CCw32?=i486-mingw32-gcc
 CFLAGS+=-O2 -Wall
-PREFIX?=/usr
+PREFIX?=/usr/local
 DESTDIR?=
 
 all:
 	${CC} ${CFLAGS} ired.c -o ired
 
 dist:
-	if [ -z "${VERSION}" ]; then echo "make dist VERSION=0.3" ; exit 1 ; fi
+	@if [ -z "${VERSION}" ]; then echo "Try: make dist VERSION=0.5" ; exit 1 ; fi
 	mkdir -p ired-${VERSION}
 	cd ired-${VERSION} ; hg clone .. . ; rm -rf .hg
 	tar czvf ired-${VERSION}.tar.gz ired-${VERSION}

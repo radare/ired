@@ -2,6 +2,8 @@
 # vired: the visual raw editor
 # copyleft: pancake at nopcode dot org @ 2009
 
+PATH=.:$PATH
+
 if [ -n "$1" ]; then
   $0 | ired -n $@
   exit 0

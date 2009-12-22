@@ -9,8 +9,8 @@ all:
 
 dist:
 	@if [ -z "${VERSION}" ]; then echo "Try: make dist VERSION=0.5" ; exit 1 ; fi
-	mkdir -p ired-${VERSION}
-	cd ired-${VERSION} ; hg clone .. . ; rm -rf .hg
+	hg clone . ired-${VERSION}
+	rm -rf ired-${VERSION}/.hg
 	tar czvf ired-${VERSION}.tar.gz ired-${VERSION}
 	rm -rf ired-${VERSION}
 

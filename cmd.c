@@ -167,7 +167,7 @@ static void cmd_resize(char *arg) {
 					io_seek(curseek+i, SEEK_SET);
 					if (io_write(buf, len)<len)
 						perror("io_write"),ret=-1;
-				} else perror("io_read"), ret=-1;
+				} else break; //perror("io_read"), ret=-1;
 			}
 			free(buf);
 			if ((ret = io_seek(0, SEEK_END))>n)

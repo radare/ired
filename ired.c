@@ -8,15 +8,16 @@ static char *script = 0;
 static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
+#define BUFSZ 32*1024
 
 #include "ired.h"
 #include "util.c"
 #include "cmd.c"
 
 static void red_slurpin() {
-	ut8 buf[4096];
+	ut8 buf[BUFSZ];
 	for(;;) {
-		int len = read(0, buf, 4096);
+		int len = read(0, buf, sizeof(buf));
 		if (len<1) break;
 		hexdump(buf, len, 16);
 		curseek += len;
@@ -24,11 +25,11 @@ static void red_slurpin() {
 }
 
 static void red_interpret(char *file) {
-	char buf[1024];
+	char buf[BUFSZ];
 	FILE *fd = fopen(file, "r");
 	if (fd != NULL) {
 		for(;;) {
-			if (fgets(buf, 1023, fd) == NULL)
+			if (fgets(buf, sizeof(buf), fd) == NULL)
 				break;
 			red_cmd(buf);
 		}
@@ -59,12 +60,12 @@ static int red_cmd(char *cmd) {
 }
 
 static int red_prompt() {
-	char *at, *at2, line[4096];
+	char *at, *at2, line[BUFSZ];
 	if (verbose) {
 		printf("[0x%08"LLF"x]> ", curseek);
 		fflush(stdout);
 	}
-	if (fgets(line, 4095, stdin) == NULL)
+	if (fgets(line, sizeof(line), stdin) == NULL)
 		return 0;
 	line[strlen(line)-1] = '\0';
 	if (*line != '!') {

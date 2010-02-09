@@ -4,8 +4,13 @@ CFLAGS+=-O2 -Wall
 PREFIX?=/usr/local
 DESTDIR?=
 
-all:
-	${CC} ${CFLAGS} ired.c -o ired
+all: ired bdiff
+
+bdiff: bdiff.o
+	${CC} ${CFLAGS} bdiff.o -o bdiff
+
+ired: ired.o
+	${CC} ${CFLAGS} ired.o -o ired
 
 dist:
 	@if [ -z "${VERSION}" ]; then echo "Try: make dist VERSION=0.5" ; exit 1 ; fi
@@ -26,6 +31,7 @@ clean:
 install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp ired ${DESTDIR}${PREFIX}/bin
+	cp bdiff ${DESTDIR}${PREFIX}/bin
 	cp vired ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${PREFIX}/share/man/man1
 	cp ired.1 ${DESTDIR}${PREFIX}/share/man/man1

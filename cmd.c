@@ -128,7 +128,7 @@ static void cmd_help(char *arg) {
 		"x[size]       hexdump\n"
 		"X[size]       hexpair dump\n"
 		"p[fmt]        print formatted current block ('p' for help)\n"
-		"r[-[num]]     truncate or -remove N bytes\n"
+		"r[+-[num]]    truncate or -remove N bytes\n"
 		".[file]       interpret file\n"
 		"<[file]       load file in current seek\n"
 		">[file]       dump current block to file\n"
@@ -138,25 +138,45 @@ static void cmd_help(char *arg) {
 }
 
 static void cmd_resize(char *arg) {
-	int len, ret = 0;
-	if (!*arg) printf("%"LLF"d\n", (ut64)io_seek(0, SEEK_END));
-	else if (*arg=='-') {
-		ut8 *buf = malloc(bsize);
+	ut8 *buf;
+	ut64 tail, n;
+	int i, len, ret = 0;
+	switch(*arg) {
+	case '\0':
+		printf("%"LLF"d\n", (ut64)io_seek(0, SEEK_END));
+		break;
+	case '+': // XXX: needs cleanup
+		n = str2ut64(arg+1);
+		len = (ut64)io_seek(0, SEEK_END);
+		tail = len-curseek;
+		if ((buf=malloc(tail))) { // XXX: Use block
+			io_seek(curseek, SEEK_SET);
+			io_read(buf, tail);
+			io_seek(curseek+n, SEEK_SET);
+			io_write(buf, tail);
+			free (buf);
+		} else perror("malloc");
+		break;
+	case '-':
+		buf = malloc(bsize);
 		if (buf) {
-			ut64 i, n = str2ut64(arg+1);
+			n = str2ut64(arg+1);
 			for(i=0;!ret;i+=len) {
 				io_seek(curseek+n+i, SEEK_SET);
 				if ((len = io_read(buf, bsize))>0) {
 					io_seek(curseek+i, SEEK_SET);
 					if (io_write(buf, len)<len)
 						perror("io_write"),ret=-1;
-				} else perror("io_read"), ret=-1;
+				} else break; //perror("io_read"), ret=-1;
 			}
 			free(buf);
 			if ((ret = io_seek(0, SEEK_END))>n)
 				ret = io_truncate(ret-n);
-		}
-	} else ret = io_truncate(str2ut64(arg));
+		} else perror("malloc");
+		break;
+	default:
+		ret = io_truncate(str2ut64(arg));
+	}
 	if (ret<0)
 		perror("truncate");
 }

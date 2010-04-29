@@ -1,6 +1,6 @@
 #!/bin/sh
 # vired: the visual raw editor
-# copyleft: pancake at nopcode dot org @ 2009
+# copyleft: pancake at nopcode dot org @ 2009-2010
 
 PATH=.:$PATH
 

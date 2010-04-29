@@ -11,7 +11,14 @@ function btest {
 	../bdiff $1 $2 > tmp.ired
 	../ired -n tmp < tmp.ired
 	test `hash tmp` = `hash $2`
-	echo $? $1 $2
+	ret=$?
+	echo $ret $1 $2
+	if [ $ret = 1 ]; then
+		if [ -n "`echo $1| grep file`" ]; then
+			diff -u $2 tmp
+		fi
+	fi
+#/	rm -f tmp.ired tmp
 }
 
 (cd .. && make -s)
@@ -25,3 +32,8 @@ else
 		done
 	done
 fi
+
+#btest /etc/services /etc/fstab
+
+#btest /bin/true /bin/false
+#radiff /bin/false tmp 

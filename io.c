@@ -8,7 +8,7 @@ static inline int io_open(char *file) {
 	_fd = CreateFile(file, GENERIC_READ | GENERIC_WRITE, 
 		FILE_SHARE_READ|FILE_SHARE_WRITE,
 		NULL, OPEN_ALWAYS, 0, NULL);
-	if (_fd == INVALID_HANDLE_VALUE)
+	if(_fd == INVALID_HANDLE_VALUE)
 	_fd = CreateFile(file, GENERIC_READ, FILE_SHARE_READ,
 		NULL, OPEN_ALWAYS, 0, NULL);
 	return (_fd==INVALID_HANDLE_VALUE)?-1:0;
@@ -32,7 +32,7 @@ static inline int io_read(void *x, int y) {
 static int _fd = -1;
 static inline int io_open(char *file) {
 	_fd = open(file, O_RDWR|O_CREAT, 0644);
-	if (_fd == -1) _fd = open(file, O_RDONLY);
+	if(_fd == -1) _fd = open(file, O_RDONLY);
 	return _fd;
 }
 #define io_read(x,y) read(_fd, x, y)

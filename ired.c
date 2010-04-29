@@ -1,4 +1,4 @@
-/* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
+/* Copyleft 2009-2010 -- pancake /at/ nopcode /dot/ org */
 
 #define ut64 unsigned long long 
 #define ut8 unsigned char
@@ -8,7 +8,7 @@ static char *script = 0;
 static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
-#define BUFSZ 32*1024
+#define BUFSZ 128*1024
 
 #include "ired.h"
 #include "util.c"
@@ -18,7 +18,7 @@ static void red_slurpin() {
 	ut8 buf[BUFSZ];
 	for(;;) {
 		int len = read(0, buf, sizeof(buf));
-		if (len<1) break;
+		if(len<1) break;
 		hexdump(buf, len, 16);
 		curseek += len;
 	}
@@ -27,9 +27,9 @@ static void red_slurpin() {
 static void red_interpret(char *file) {
 	char buf[BUFSZ];
 	FILE *fd = fopen(file, "r");
-	if (fd != NULL) {
+	if(fd != NULL) {
 		for(;;) {
-			if (fgets(buf, sizeof(buf), fd) == NULL)
+			if(fgets(buf, sizeof(buf), fd) == NULL)
 				break;
 			red_cmd(buf);
 		}
@@ -61,25 +61,25 @@ static int red_cmd(char *cmd) {
 
 static int red_prompt() {
 	char *at, *at2, line[BUFSZ];
-	if (verbose) {
+	if(verbose) {
 		printf("[0x%08"LLF"x]> ", curseek);
 		fflush(stdout);
 	}
-	if (fgets(line, sizeof(line), stdin) == NULL)
+	if(fgets(line, sizeof(line), stdin) == NULL)
 		return 0;
 	line[strlen(line)-1] = '\0';
-	if (*line != '!') {
+	if(*line != '!') {
 		at = strchr(line, '@');
 		oldseek = curseek;
 		obsize = bsize;
-		if (at) {
+		if(at) {
 			*at = 0;
 			at2 = strchr(++at, ':');
-			if (at2) {
+			if(at2) {
 				*at2 = 0; at2++;
-				if (*at2) bsize = (int)str2ut64(at2);
+				if(*at2) bsize = (int)str2ut64(at2);
 			}
-			if (*at) curseek = str2ut64(at);
+			if(*at) curseek = str2ut64(at);
 		}
 	}
 	return red_cmd(skipspaces(line));
@@ -87,10 +87,10 @@ static int red_prompt() {
 
 static int red_open(char *file) {
 	int ret = io_open(file);
-	if (ret != -1) {
+	if(ret != -1) {
 		oldseek = 0;
 		setenv("FILE", file, 1);
-		if (script)
+		if(script)
 			red_interpret(script);
 		while(red_prompt()) {
 			curseek = oldseek;
@@ -108,9 +108,9 @@ static int red_help() {
 
 int main(int argc, char **argv) {
 	int i, ret = 1;
-	if (argc>1)
+	if(argc>1)
 	for(i=1;i<argc;i++) {
-		if (argv[i][0]=='-')
+		if(argv[i][0]=='-')
 			switch(argv[i][1]) {
 			case 'i': script = argv[++i]; break;
 			case 'n': verbose = 0; break;

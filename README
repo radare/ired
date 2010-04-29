@@ -39,6 +39,6 @@ TODO:
 
 TODO/TOTHINK
 ============
-- Remove '.' command? do it suckless
+- Remove '.' command? to make it suck less
 - Add .! command that runs !foo > file and then .file
 - Support for multiple commands in a single line (';' separator)

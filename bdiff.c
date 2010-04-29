@@ -45,21 +45,21 @@ static int splitlines(const char *a, int len, struct line **lr) {
 
 	/* count the lines */
 	i = 1; /* extra line for sentinel */
-	for (p = a; p < a + len; p++)
-		if (*p == '\n' || p == plast)
+	for(p = a; p < a + len; p++)
+		if(*p == '\n' || p == plast)
 			i++;
 
 	*lr = l = (struct line *)malloc(sizeof(struct line) * i);
-	if (!l)
+	if(!l)
 		return -1;
 
 	/* build the line array and calculate hashes */
 	h = 0;
-	for (p = a; p < a + len; p++) {
+	for(p = a; p < a + len; p++) {
 		/* Leonid Yuriev's hash */
 		h = (h * 1664525) + *p + 1013904223;
 
-		if (*p == '\n' || p == plast) {
+		if(*p == '\n' || p == plast) {
 			l->h = h;
 			h = 0;
 			l->len = p - b + 1;
@@ -85,33 +85,33 @@ static int equatelines(struct line *a, int an, struct line *b, int bn) {
 	struct pos *h = NULL;
 
 	/* build a hash table of the next highest power of 2 */
-	while (buckets < bn + 1)
+	while(buckets < bn + 1)
 		buckets *= 2;
 
 	/* try to allocate a large hash table to avoid collisions */
-	for (scale = 4; scale; scale /= 2) {
+	for(scale = 4; scale; scale /= 2) {
 		h = (struct pos *)malloc(scale * buckets * sizeof(struct pos));
-		if (h)
+		if(h)
 			break;
 	}
 
-	if (!h)
+	if(!h)
 		return 0;
 
 	buckets = buckets * scale - 1;
 
 	/* clear the hash table */
-	for (i = 0; i <= buckets; i++) {
+	for(i = 0; i <= buckets; i++) {
 		h[i].pos = INT_MAX;
 		h[i].len = 0;
 	}
 
 	/* add lines to the hash table chains */
-	for (i = bn - 1; i >= 0; i--) {
+	for(i = bn - 1; i >= 0; i--) {
 		/* find the equivalence class */
-		for (j = b[i].h & buckets; h[j].pos != INT_MAX;
+		for(j = b[i].h & buckets; h[j].pos != INT_MAX;
 		     j = (j + 1) & buckets)
-			if (!cmp(b + i, b + h[j].pos))
+			if(!cmp(b + i, b + h[j].pos))
 				break;
 
 		/* add to the head of the equivalence class */
@@ -125,18 +125,17 @@ static int equatelines(struct line *a, int an, struct line *b, int bn) {
 	t = (bn >= 4000) ? bn / 1000 : bn + 1;
 
 	/* match items in a to their equivalence class in b */
-	for (i = 0; i < an; i++) {
+	for(i = 0; i < an; i++) {
 		/* find the equivalence class */
-		for (j = a[i].h & buckets; h[j].pos != INT_MAX;
+		for(j = a[i].h & buckets; h[j].pos != INT_MAX;
 		     j = (j + 1) & buckets)
-			if (!cmp(a + i, b + h[j].pos))
+			if(!cmp(a + i, b + h[j].pos))
 				break;
 
 		a[i].e = j; /* use equivalence class for quick compare */
-		if (h[j].len <= t)
+		if(h[j].len <= t)
 			a[i].n = h[j].pos; /* point to head of match list */
-		else
-			a[i].n = INT_MAX; /* too popular */
+		else a[i].n = INT_MAX; /* too popular */
 	}
 
 	/* discard hash tables */
@@ -148,23 +147,22 @@ static int longest_match(struct line *a, struct line *b, struct pos *pos,
 			 int a1, int a2, int b1, int b2, int *omi, int *omj) {
 	int mi = a1, mj = b1, mk = 0, mb = 0, i, j, k;
 
-	for (i = a1; i < a2; i++) {
+	for(i = a1; i < a2; i++) {
 		/* skip things before the current block */
-		for (j = a[i].n; j < b1; j = b[j].n)
+		for(j = a[i].n; j < b1; j = b[j].n)
 			;
 
 		/* loop through all lines match a[i] in b */
-		for (; j < b2; j = b[j].n) {
+		for(; j < b2; j = b[j].n) {
 			/* does this extend an earlier match? */
-			if (i > a1 && j > b1 && pos[j - 1].pos == i - 1)
+			if(i > a1 && j > b1 && pos[j - 1].pos == i - 1)
 				k = pos[j - 1].len + 1;
-			else
-				k = 1;
+			else k = 1;
 			pos[j].pos = i;
 			pos[j].len = k;
 
 			/* best match so far? */
-			if (k > mk) {
+			if(k > mk) {
 				mi = i;
 				mj = j;
 				mk = k;
@@ -172,16 +170,16 @@ static int longest_match(struct line *a, struct line *b, struct pos *pos,
 		}
 	}
 
-	if (mk) {
+	if(mk) {
 		mi = mi - mk + 1;
 		mj = mj - mk + 1;
 	}
 
 	/* expand match to include neighboring popular lines */
-	while (mi - mb > a1 && mj - mb > b1 &&
+	while(mi - mb > a1 && mj - mb > b1 &&
 	       a[mi - mb - 1].e == b[mj - mb - 1].e)
 		mb++;
-	while (mi + mk < a2 && mj + mk < b2 &&
+	while(mi + mk < a2 && mj + mk < b2 &&
 	       a[mi + mk].e == b[mj + mk].e)
 		mk++;
 
@@ -197,9 +195,8 @@ static void recurse(struct line *a, struct line *b, struct pos *pos,
 
 	/* find the longest match in this chunk */
 	k = longest_match(a, b, pos, a1, a2, b1, b2, &i, &j);
-	if (!k)
+	if(!k)
 		return;
-
 	/* and recurse on the remaining chunks on either side */
 	recurse(a, b, pos, a1, i, b1, j, l);
 	l->head->a1 = i;
@@ -222,34 +219,30 @@ static struct hunklist diff(struct line *a, int an, struct line *b, int bn) {
 	/* we can't have more matches than lines in the shorter file */
 	l.head = l.base = (struct hunk *)malloc(sizeof(struct hunk) *
 	                                        ((an<bn ? an:bn) + 1));
-
-	if (pos && l.base && t) {
+	if(pos && l.base && t) {
 		/* generate the matching block list */
 		recurse(a, b, pos, 0, an, 0, bn, &l);
 		l.head->a1 = l.head->a2 = an;
 		l.head->b1 = l.head->b2 = bn;
 		l.head++;
 	}
-
 	free(pos);
 
 	/* normalize the hunk list, try to push each hunk towards the end */
-	for (curr = l.base; curr != l.head; curr++) {
+	for(curr = l.base; curr != l.head; curr++) {
 		struct hunk *next = curr+1;
 		int shift = 0;
-
-		if (next == l.head)
+		if(next == l.head)
 			break;
-
-		if (curr->a2 == next->a1)
-			while (curr->a2+shift < an && curr->b2+shift < bn
+		if(curr->a2 == next->a1)
+			while(curr->a2+shift < an && curr->b2+shift < bn
 			       && !cmp(a+curr->a2+shift, b+curr->b2+shift))
 				shift++;
-		else if (curr->b2 == next->b1)
-			while (curr->b2+shift < bn && curr->a2+shift < an
+		else if(curr->b2 == next->b1)
+			while(curr->b2+shift < bn && curr->a2+shift < an
 			       && !cmp(b+curr->b2+shift, a+curr->a2+shift))
 				shift++;
-		if (!shift)
+		if(!shift)
 			continue;
 		curr->b2 += shift;
 		next->b1 += shift;
@@ -261,21 +254,26 @@ static struct hunklist diff(struct line *a, int an, struct line *b, int bn) {
 }
 
 char *slurp(const char *str, int *usz) {
-        char *ret;
-        long sz;
-        FILE *fd = fopen (str, "rb");
-        if (fd == NULL)
-                return NULL;
-        fseek (fd, 0, SEEK_END);
-        sz = ftell (fd);
-        fseek(fd, 0, SEEK_SET);
-        ret = (char *)malloc (sz+1);
-        fread (ret, sz, 1, fd);
-        ret[sz] = '\0';
-        fclose (fd);
-	if (usz)
+	char *ret;
+	long sz, n, num = 0;
+	FILE *fd = fopen(str, "rb");
+	if(fd == NULL)
+		return NULL;
+	fseek(fd, 0, SEEK_END);
+	sz = ftell(fd);
+	fseek(fd, 0, SEEK_SET);
+	ret = (char *)malloc(sz+1);
+	do {
+		n = fread(ret, 1, sz, fd);
+		if(n<1)
+			break;
+		num += n;
+	} while(num < sz);
+	ret[num] = '\0';
+	fclose(fd);
+	if(usz)
 		*usz = (int)sz;
-        return ret;
+	return ret;
 }
 
 int bdiff(const char *filea, const char *fileb) {
@@ -286,51 +284,59 @@ int bdiff(const char *filea, const char *fileb) {
 	struct hunklist l = { NULL, NULL };
 	struct hunk *h;
 
-	if ((sa = slurp (filea, &la)) == NULL)
-		return fprintf (stderr, "Cannot open %s\n", filea), 0;
-	if ((sb = slurp (fileb, &lb)) == NULL)
-		return fprintf (stderr, "Cannot open %s\n", fileb), 0;
+	if((sa = slurp(filea, &la)) == NULL)
+		return fprintf(stderr, "Cannot open %s\n", filea), 0;
+	if((sb = slurp(fileb, &lb)) == NULL)
+		return fprintf(stderr, "Cannot open %s\n", fileb), 0;
 
-	an = splitlines (sa, la, &al);
-	bn = splitlines (sb, lb, &bl);
-	if (!al || !bl)
+	/* TODO: split to function here */
+	an = splitlines(sa, la, &al);
+	bn = splitlines(sb, lb, &bl);
+	if(!al || !bl)
 		return -1;
 
-	l = diff (al, an, bl, bn);
-	if (!l.head)
+	l = diff(al, an, bl, bn);
+	if(!l.head)
 		return -1;
 
 	la = lb = 0;
-	for (h = l.base; h != l.head; h++) {
-		if (h->a1 != la || h->b1 != lb) {
+	for(h = l.base; h != l.head; h++) {
+		if(h->a1 != la || h->b1 != lb) {
 			len = bl[h->b1].l - bl[lb].l;
 			offa = al[la].l - al->l;
 			offb = al[h->a1].l - al->l;
 			rlen = offb-offa;
 
-//fprintf (stderr, "all: %d %d\n", );
-//fprintf (stderr, "len: %d %d\n", len, rlen);
-//fprintf (stderr, "off: %d %d\n", offa, offb);
-//			if (len != 0 && rlen != 0) {
-				if (rlen>len) {
-					printf ("r-%d@%d ## ++\n", (rlen-len), offa);
-				} else {
-					printf ("r+%d@%d ## --\n", (len-rlen), offa);
+			//fprintf(stderr, "all: %d %d\n", );
+			//fprintf(stderr, "len: %d %d\n", len, rlen);
+			//fprintf(stderr, "off: %d %d\n", offa, offb);
+			if(rlen>len)
+				printf("r-%d@%d\n", (rlen-len), offa);
+			else printf("r+%d@%d\n", (len-rlen), offb);
+
+			if(len == rlen) {
+				for(i=0; i<len; i++) {
+					if(bl[lb].l[i] != bl[la].l[i])
+					fprintf(stderr, "%02x %02x\n",
+							(unsigned char)
+							bl[lb].l[i],
+							(unsigned char)
+							bl[la].l[i]);
 				}
-//			}
-
-			if (len > 0) {
-				printf ("w ");
-				for(i=0;i<len;i++)
-					printf ("%02x", bl[lb].l[i]);
-				printf ("@%d # yy\n", offa);
+				// XXX fprintf(stderr, "%02x @ 0x%x\n", bl[la].l[i], offa);
+				fprintf(stderr, "WARNING: Binary patch failed\n");
 			}
-
-			if (rlen >0) {
-				printf ("w ");
-				for(i=0;i<rlen;i++)
-					printf ("%02x", bl[la].l[i]);
-				printf ("@%d # xx\n", offa);
+			if(len > 0) {
+				printf("w ");
+				for(i=0;i<len;i++)
+					printf("%02x", (unsigned char)bl[lb].l[i]);
+				printf("@%d#len\n", offa);
+			} else
+			if(rlen > 0) {
+				printf("w ");
+				for(i=0; i<rlen; i++)
+					printf("%02x", (unsigned char)bl[la].l[i]);
+				printf("@%d#rlen\n", offa);
 			}
 		}
 		la = h->a2;
@@ -345,10 +351,10 @@ int bdiff(const char *filea, const char *fileb) {
 
 int main(int argc, const char **argv) {
 	int ret = 1;
-	if (argc == 3) {
-		if (bdiff (argv[1], argv[2]) == -1)
-			fprintf (stderr, "Out of memory\n");
+	if(argc == 3) {
+		if(bdiff(argv[1], argv[2]) == -1)
+			fprintf(stderr, "Out of memory\n");
 		else ret = 0;
-	} else fprintf (stderr, "bdiff [file] [file2] > patch.ired\n");
+	} else fprintf(stderr, "bdiff [file] [file2] > patch.ired\n");
 	return ret;
 }

@@ -10,7 +10,7 @@ static inline char *skipspaces(char *arg) {
 static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	unsigned int i, j;
 	for(i=0;i<len;i+=w) {
-		printf("0x%08"LLF"x ", curseek+i);
+		printf("0x%08"LLF"x: ", curseek+i);
 		for(j=i;j<i+w;j++) {
 			if(j>=len) {
 				printf(j%2?"   ":"  ");
@@ -18,10 +18,9 @@ static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 			}
 			printf(j%2?"%02x ":"%02x", buf[j]);
 		}
-		for(j=i;j<i+w;j++) {
-			if(j>=len) printf(" ");
-			else printf("%c", isprint(buf[j])?buf[j]:'.');
-		}
+		printf(" ");
+		for(j=i;j<i+w;j++)
+			printf("%c", isprint(buf[j])?buf[j]:'.');
 		printf("\n");
 	}
 }

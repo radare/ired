@@ -3,3 +3,4 @@
 * getcurblock can manage its own memory.. all those free's can be removed
 * Find a way to return original value if str2ut64 fails (2nd arg..)
 * Add math support to '?' command
+* w<- should write from stdin

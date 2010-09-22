@@ -71,7 +71,7 @@ static void cmd_seek(char *arg) {
 	else if(*arg=='+') curseek += str2ut64(arg+1);
 	else if(*arg=='-') curseek -= str2ut64(arg+1);
 	else curseek = str2ut64(arg);
-	oldseek = curseek;
+	io_seek((oldseek=curseek), 0);
 }
 
 static void cmd_dump(char *file) {

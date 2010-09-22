@@ -26,7 +26,7 @@ loc:
 	@wc -l *.c *.h | grep total
 
 clean:
-	rm -f ired ired.o
+	rm -f ired ired.o bdiff bdiff.o
 
 install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin

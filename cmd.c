@@ -36,7 +36,7 @@ static void cmd_bytedump(char *arg) {
 	}
 }
 
-static void cmd_search(char *arg) {
+static void cmd_search(unsigned char *arg) {
 	ut8 *buf;
 	int i, len, hit = 0;
 	arg = skipspaces(arg);

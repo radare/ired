@@ -1,14 +1,20 @@
-RED stands for the raw editor
-============================= --pancake
+IRED stands for the raw editor
+==============================
 
 red aims to be a minimalistic reimplementation of the radare shell
 without much complexity and relaying all the extensibility to
 external applications trying to keep the source as small as possible.
 
+AUTHOR
+------
+	pancake<nopcode.org>
+
 COMMANDS
 ========
 
 ? is for help   get help or evaluate numeric expression
+/ search        search strings or hexpairs
+!cmd            run command from shell
 x hexdump       hexdump
 X dword dump    hexpair dump
 > file          dump current block to file

@@ -30,12 +30,12 @@ clean:
 
 install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	cp ired ${DESTDIR}${PREFIX}/bin
-	cp bdiff ${DESTDIR}${PREFIX}/bin
-	cp vired ${DESTDIR}${PREFIX}/bin
+	cp -f ired ${DESTDIR}${PREFIX}/bin
+	cp -f bdiff ${DESTDIR}${PREFIX}/bin
+	cp -f vired ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${PREFIX}/share/man/man1
-	cp ired.1 ${DESTDIR}${PREFIX}/share/man/man1
-	cp vired.1 ${DESTDIR}${PREFIX}/share/man/man1
+	cp -f ired.1 ${DESTDIR}${PREFIX}/share/man/man1
+	cp -f vired.1 ${DESTDIR}${PREFIX}/share/man/man1
 
 deinstall uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/ired

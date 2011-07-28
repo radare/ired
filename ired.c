@@ -38,22 +38,24 @@ static void red_interpret(char *file) {
 }
 
 static int red_cmd(char *cmd) {
+	char *arg = cmd+1;
+	SKIPSPACES(arg);
 	switch(*cmd) {
 	case 'q': return 0;
 	case ';': case '#': break; // comment
-	case '>': cmd_dump(cmd+1); break;
-	case '<': cmd_load(cmd+1); break;
-	case '.': red_interpret(skipspaces(cmd+1)); break;
-	case 's': cmd_seek(cmd+1); break;
-	case 'b': cmd_bsize(cmd+1); break;
-	case '/': cmd_search(cmd+1); break;
-	case 'p': cmd_print(cmd+1); break;
-	case 'r': cmd_resize(cmd+1); break;
-	case 'x': cmd_hexdump(cmd+1); break;
-	case 'X': cmd_bytedump(cmd+1); break;
-	case 'w': cmd_write(cmd+1); break;
-	case '!': cmd_system(cmd+1); break;
-	case '?': cmd_help(cmd+1); break;
+	case '>': cmd_dump(arg); break;
+	case '<': cmd_load(arg); break;
+	case '.': red_interpret(arg); break;
+	case 's': cmd_seek(arg); break;
+	case 'b': cmd_bsize(arg); break;
+	case '/': cmd_search(arg); break;
+	case 'p': cmd_print(arg); break;
+	case 'r': cmd_resize(arg); break;
+	case 'x': cmd_hexdump(arg); break;
+	case 'X': cmd_bytedump(arg); break;
+	case 'w': cmd_write(arg); break;
+	case '!': cmd_system(arg); break;
+	case '?': cmd_help(arg); break;
 	default: fprintf(stderr, "? %s\n", cmd);
 	}
 	return 1;
@@ -82,7 +84,9 @@ static int red_prompt() {
 			if(*at) curseek = str2ut64(at);
 		}
 	}
-	return red_cmd(skipspaces(line));
+	at = line;
+	SKIPSPACES(at);
+	return red_cmd(at);
 }
 
 static int red_open(char *file) {

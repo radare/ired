@@ -25,7 +25,7 @@ static void cmd_print(char *arg) {
 		"./:/*        skip 1 or 4 chars, repeat last format instead of cycle\n");
 }
 
-static void cmd_bytedump(char *arg) {
+static void cmd_bytedump(const char *arg) {
 	int i, len = bsize;
 	ut8 *buf = getcurblk(arg, &len);
 	if(buf) {
@@ -36,25 +36,32 @@ static void cmd_bytedump(char *arg) {
 	}
 }
 
-static void cmd_search(unsigned char *arg) {
-	ut8 *buf;
-	int i, len, hit = 0;
-	arg = skipspaces(arg);
+static void cmd_search(const char *arg) {
+	ut8 *buf, *barg;
+	size_t len;
+	int i, hit = 0;
+	SKIPSPACES(arg);
 	if(*arg=='"') {
 		arg++;
-		len = strlen(arg)-1;
-		arg[len]='\0';
-	} else len = hexstr2raw(arg);
+		barg = (ut8*)strdup(arg);
+		len = strlen((const char *)barg)-1;
+		// TODO: ensure last char is '"'
+		barg[len]='\0';
+	} else {
+		barg = (ut8*)strdup(arg);
+		len = hexstr2raw(barg);
+	}
 	if((buf = getcurblk("", &bsize)))
 	do {
 		for(i=0;i<bsize;i++) {
-			if(arg[hit++]!=buf[i]) hit = 0;
+			if(barg[hit++]!=buf[i]) hit = 0;
 			else if(hit == len)
 				printf("0x%"LLF"x\n", curseek+i-len+1);
 		}
 		curseek += bsize;
 	} while(io_read(buf, bsize)>0);
 	free(buf);
+	free(barg);
 }
 
 static void cmd_bsize(char *arg) {
@@ -104,16 +111,23 @@ static void cmd_load(char *file) {
 	} else perror("fopen");
 }
 
-static void cmd_write(char *arg) {
+static void cmd_write(const char *arg) {
+	ut8 *barg;
 	int len;
-	arg = skipspaces(arg);
+	SKIPSPACES(arg);
 	if(*arg=='"') {
+		barg = (ut8*)strdup (arg+1);
 		len = strlen(++arg)-1;
-		arg[len]='\0';
-	} else len = hexstr2raw(arg);
+		// TODO: ensure last char is "
+		barg[len] = '\0';
+	} else {
+		barg = (ut8*)strdup (arg);
+		len = hexstr2raw(barg);
+	}
 	io_seek(curseek, SEEK_SET);
 	if(len<1 || io_write(arg, len)<len)
 		perror("io_write");
+	free (arg);
 }
 
 static void cmd_help(char *arg) {
@@ -183,7 +197,8 @@ static void cmd_resize(char *arg) {
 
 static void cmd_system(char *arg) {
 	int len = bsize;
-	char *buf, str[1024];
+	char str[1024];
+	ut8 *buf;
 	if(strstr(arg, "BLOCK")) {
 		FILE *fd = fopen(".curblk", "wb");
 		if(fd) {

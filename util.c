@@ -2,11 +2,6 @@
 
 #include <ctype.h>
 
-static inline char *skipspaces(char *arg) {
-	while(*arg==' '||*arg=='\t') arg++;
-	return arg;
-}
-
 static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	unsigned int i, j;
 	for(i=0;i<len;i+=w) {
@@ -63,9 +58,9 @@ static void print_fmt(const ut8 *buf, char *fmt, unsigned int len) {
 	} while(!rep && inc && inc<len);
 }
 
-static ut64 str2ut64(char *str) {
+static ut64 str2ut64(const char *str) {
 	ut64 ret = 0LL;
-	str = skipspaces(str);
+	SKIPSPACES(str);
 	if(str[0]=='b'&&str[1]=='\0')
 		ret = bsize;
 	else if(str[0]=='0') {
@@ -87,7 +82,7 @@ static int hex2byte(ut8 *val, ut8 c) {
 	return 0;
 }
 
-static unsigned int hexstr2raw(char *arg) {
+static unsigned int hexstr2raw(ut8 *arg) {
 	ut8 *ptr, d, c = 0;
 	unsigned int j = 0, len = 0;
 	for(ptr=(ut8 *)arg; *ptr; ptr++) {
@@ -105,10 +100,10 @@ static unsigned int hexstr2raw(char *arg) {
 	return len;
 }
 
-static void *getcurblk(char *arg, int *len) {
-	void *buf = NULL;
+static ut8 *getcurblk(const char *arg, int *len) {
+	ut8 *buf = NULL;
 	if(*arg) {
-		*len = (int)str2ut64(arg);
+		*len = (int)str2ut64((const char *)arg);
 		if(*len<1) *len = bsize;
 	}
 	if(*len>0 && (buf = malloc(*len)) != NULL) {

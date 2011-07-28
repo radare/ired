@@ -37,7 +37,7 @@ install:
 	cp ired.1 ${DESTDIR}${PREFIX}/share/man/man1
 	cp vired.1 ${DESTDIR}${PREFIX}/share/man/man1
 
-uninstall:
+deinstall uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/ired
 	rm -f ${DESTDIR}${PREFIX}/bin/vired
 	rm -f ${DESTDIR}${PREFIX}/share/man/man1/ired.1

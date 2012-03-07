@@ -127,7 +127,7 @@ static void cmd_write(const char *arg) {
 	io_seek(curseek, SEEK_SET);
 	if(len<1 || io_write(arg, len)<len)
 		perror("io_write");
-	free (arg);
+	free ((void*)arg);
 }
 
 static void cmd_help(char *arg) {

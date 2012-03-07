@@ -1,4 +1,4 @@
-/* Copyleft 2009-2010 -- pancake /at/ nopcode /dot/ org */
+/* Copyleft 2009-2012 -- pancake /at/ nopcode /dot/ org */
 
 #define ut64 unsigned long long 
 #define ut8 unsigned char
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 			switch(argv[i][1]) {
 			case 'i': script = argv[++i]; break;
 			case 'n': verbose = 0; break;
-			case 'v': puts("red "VERSION" 2009"); ret = 0; break;
+			case 'v': puts("ired "VERSION); ret = 0; break;
 			case 'h': ret = red_help(); break;
 			case 0x0: red_slurpin(); ret = 0; break;
 		} else ret = red_open(argv[i]);

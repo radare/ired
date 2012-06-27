@@ -121,6 +121,7 @@ static void cmd_write(const char *arg) {
 		// TODO: ensure last char is "
 		barg[len] = '\0';
 	} else {
+fprintf(stderr, "panda! (%s)\n", arg);
 		barg = (ut8*)strdup (arg);
 		len = hexstr2raw(barg);
 	}

@@ -34,7 +34,7 @@ static void red_interpret(char *file) {
 			red_cmd(buf);
 		}
 		fclose(fd);
-	} else fprintf(stderr, "Cannot open script file '%s'\n", file);
+	} else fprintf(stderr, "Cannot open script file '%s'\n", file? file: "");
 }
 
 static int red_cmd(char *cmd) {
@@ -101,7 +101,7 @@ static int red_open(char *file) {
 			bsize = obsize;
 		}
 		io_close();
-	} else fprintf(stderr, "Cannot open '%s'\n", file);
+	} else fprintf(stderr, "Cannot open '%s'\n", file? file: "");
 	return ret==-1 ?1:0;;
 }
 
@@ -112,9 +112,10 @@ static int red_help() {
 
 int main(int argc, char **argv) {
 	int i, ret = 1;
-	if(argc>1)
-	for(i=1;i<argc;i++) {
-		if(argv[i][0]=='-')
+	argc++;
+	if(argc>1 && argv[1])
+	for(i=1; i<argc; i++) {
+		if(argv[i] && argv[i][0]=='-')
 			switch(argv[i][1]) {
 			case 'i': script = argv[++i]; break;
 			case 'n': verbose = 0; break;

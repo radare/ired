@@ -1,5 +1,26 @@
 /* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
+#define DEMO 0
+#if DEMO
+int bo = 0;
+char b[4096];
+static inline int io_open(char *file) {
+	memset (b, 0, sizeof (b));
+	return 10;
+}
+static int io_read(void *x,int y) {
+	memcpy (x, b+bo, y);
+	return y;
+}
+#define io_write(x,y) memcpy (b+bo, x,y)
+static int io_seek (int x,int y) {
+	bo=((y==2)?sizeof(b):(y==1)?bo+x:x);
+	return bo;
+}
+#define io_close() printf("close: TODO\n")
+#define io_system(x) system(x)
+#define io_truncate(x) printf("truncate: TODO\n");
+#else
 #if __WIN32__
 
 #include <windows.h>
@@ -42,4 +63,5 @@ static inline int io_open(char *file) {
 #define io_system(x) system(x)
 #define io_truncate(x) ftruncate(_fd, (unsigned long)x)
 
+#endif
 #endif

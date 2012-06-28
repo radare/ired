@@ -1,6 +1,20 @@
 #!/bin/sh
 
-md5=md5sum
+FILES=4
+jot 1 >/dev/null
+if [ $? = 0 ]; then
+	SEQ=`jot $FILES 1 $FILES`
+else
+	md5=`seq 1 $FILES`
+fi
+
+
+md5sum -h 2>/dev/null
+if [ $? = 0 ]; then
+	md5=md5sum
+else
+	md5=md5
+fi
 
 function hash {
 	$md5 $1 | awk '{print $1}'
@@ -26,8 +40,8 @@ function btest {
 if [ -n "$2" ]; then
 	btest $1 $2
 else
-	for i in `seq 1 4`; do
-		for j in `seq 1 4`; do
+	for i in $SEQ ; do
+		for j in $SEQ ; do
 			btest file$i file$j
 		done
 	done

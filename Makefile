@@ -9,6 +9,8 @@ all: ired bdiff
 bdiff: bdiff.o
 	${CC} ${CFLAGS} bdiff.o -o bdiff
 
+ired.o: cmd.c io.c util.c hexparse.c
+
 ired: ired.o
 	${CC} ${CFLAGS} ired.o -o ired
 

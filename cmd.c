@@ -1,4 +1,4 @@
-/* Copyleft 2009-2010 -- pancake /at/ nopcode /dot/ org */
+/* Copyleft 2009-2013 -- pancake /at/ nopcode /dot/ org */
 
 static void cmd_hexdump(char *arg) {
 	int len = bsize;

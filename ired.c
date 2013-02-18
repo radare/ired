@@ -1,4 +1,4 @@
-/* Copyleft 2009-2012 -- pancake /at/ nopcode /dot/ org */
+/* Copyleft 2009-2013 -- pancake /at/ nopcode /dot/ org */
 
 #define ut64 unsigned long long 
 #define ut8 unsigned char

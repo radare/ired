@@ -1,4 +1,4 @@
-/* bdiff - MIT - Copyright 2010 pancake<nopcode.org> */
+/* bdiff - MIT - Copyright 2010-2013 - pancake */
 /* Adapted code from:
 
  bdiff.c - efficient binary diff extension for Mercurial

@@ -1,4 +1,4 @@
-/* Copyleft 2009-2010 -- pancake /at/ nopcode /dot/ org */
+/* ired - Copyleft 2009-2013 -- pancake */
 
 #include <ctype.h>
 

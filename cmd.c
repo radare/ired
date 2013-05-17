@@ -144,9 +144,7 @@ static int cmd_write(const char *arg) {
 		return 2;
 	}
 	io_seek(curseek, SEEK_SET);
-int r;
-	if(len<1 || (r=io_write(arg, len))<len) {
-		printf ("%d %d\n",r, len);
+	if(len<1 || io_write(barg, len)<len) {
 		perror("io_write");
 		return -1;
 	}

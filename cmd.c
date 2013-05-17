@@ -103,6 +103,7 @@ static void cmd_load(char *file) {
 			int len = fread(buf, 1, bsize, fd);
 			if(len<bsize)
 				perror("fread");
+			io_seek (curseek, SEEK_SET);
 			if(io_write(buf, len)<len)
 				perror("io_write");
 		} else perror("malloc");

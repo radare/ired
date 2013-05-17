@@ -1,20 +1,22 @@
 /* Copyleft 2009-2013 -- pancake /at/ nopcode /dot/ org */
 
-static void cmd_hexdump(char *arg) {
+static int cmd_hexdump(char *arg) {
 	int len = bsize;
 	ut8 *buf = getcurblk(arg, &len);
 	if(buf && len>0) {
 		hexdump(buf, len, 16);
 		free(buf);
+		return 1;
 	}
+	return 2;
 }
 
-static void cmd_print(char *arg) {
+static int cmd_print(char *arg) {
 	ut8 *buf;
 	int len = bsize;
 	if(*arg) {
 		buf = getcurblk(arg, &len);
-		if(!buf) return;
+		if(!buf) return 2;
 		print_fmt(buf, arg, len);
 		free(buf);
 	} else printf(
@@ -23,20 +25,21 @@ static void cmd_print(char *arg) {
 		"s/S          short int16 (lil, big)\n"
 		"z/Z          zero-terminatted string (ascii, wide-ascii)\n"
 		"./:/*        skip 1 or 4 chars, repeat last format instead of cycle\n");
+	return 1;
 }
 
-static void cmd_bytedump(const char *arg) {
+static int cmd_bytedump(const char *arg) {
 	int i, len = bsize;
 	ut8 *buf = getcurblk(arg, &len);
-	if(buf) {
-		for(i=0;i<len;i++)
-			printf("%02x", buf[i]);
-		printf("\n");
-		free(buf);
-	}
+	if(!buf) return 2;
+	for(i=0;i<len;i++)
+		printf("%02x", buf[i]);
+	printf("\n");
+	free(buf);
+	return 1;
 }
 
-static void cmd_search(const char *arg) {
+static int cmd_search(const char *arg) {
 	ut8 *buf, *barg;
 	size_t len;
 	int i, hit = 0;
@@ -62,40 +65,48 @@ static void cmd_search(const char *arg) {
 	} while(io_read(buf, bsize)>0);
 	free(buf);
 	free(barg);
+	return 1;
 }
 
-static void cmd_bsize(char *arg) {
+static int cmd_bsize(char *arg) {
 	if(!*arg) printf("%d\n", bsize);
 	else if(*arg=='+') bsize += (int)str2ut64(arg+1);
 	else if(*arg=='-') bsize -= (int)str2ut64(arg+1);
 	else bsize = str2ut64(arg);
 	if(bsize<1) bsize = 1;
 	obsize = bsize;
+	return 1;
 }
 
-static void cmd_seek(char *arg) {
+static int cmd_seek(char *arg) {
 	if(!*arg) printf("%"LLF"d\n", curseek);
 	else if(*arg=='+') curseek += str2ut64(arg+1);
 	else if(*arg=='-') curseek -= str2ut64(arg+1);
 	else curseek = str2ut64(arg);
 	io_seek((oldseek=curseek), 0);
+	return 1;
 }
 
-static void cmd_dump(char *file) {
+static int cmd_dump(char *file) {
 	int len = bsize;
 	ut8 *buf = getcurblk("", &len);
 	if(len<1 || buf) {
 		FILE *fd = fopen(file, "wb");
-		if(fd) {
-			if(fwrite(buf, len, 1, fd)<len)
-				perror("fwrite");
-			fclose(fd);
-		} else perror("fopen");
+		if (!fd) {
+			free (buf);
+			return -1;
+		}
+		if(fwrite(buf, len, 1, fd)<len) {
+			perror("fwrite");
+			return -1;
+		}
+		fclose(fd);
 		free(buf);
 	} else perror("getcurblk");
+	return 1;
 }
 
-static void cmd_load(char *file) {
+static int cmd_load(char *file) {
 	FILE *fd = fopen(file, "rb");
 	if(fd) {
 		void *buf = malloc(bsize);
@@ -104,15 +115,18 @@ static void cmd_load(char *file) {
 			if(len<bsize)
 				perror("fread");
 			io_seek (curseek, SEEK_SET);
-			if(io_write(buf, len)<len)
+			if(io_write(buf, len)<len) {
 				perror("io_write");
+				return -1;
+			}
 		} else perror("malloc");
 		free(buf);
 		fclose(fd);
 	} else perror("fopen");
+	return 1;
 }
 
-static void cmd_write(const char *arg) {
+static int cmd_write(const char *arg) {
 	ut8 *barg;
 	int len;
 	SKIPSPACES(arg);
@@ -125,13 +139,22 @@ static void cmd_write(const char *arg) {
 		barg = (ut8*)strdup (arg);
 		len = hexstr2raw(barg);
 	}
+	if (len<2)  {
+		printf ("Invalid hexpair\n");
+		return 2;
+	}
 	io_seek(curseek, SEEK_SET);
-	if(len<1 || io_write(arg, len)<len)
+int r;
+	if(len<1 || (r=io_write(arg, len))<len) {
+		printf ("%d %d\n",r, len);
 		perror("io_write");
+		return -1;
+	}
 	//free ((void*)arg);
+	return 1;
 }
 
-static void cmd_help(char *arg) {
+static int cmd_help(char *arg) {
 	if(*arg) {
 		ut64 ret = str2ut64(arg);
 		printf("0x%"LLF"x %"LLF"d 0%"LLF"o\n", ret, ret, ret);
@@ -150,9 +173,10 @@ static void cmd_help(char *arg) {
 		"!cmd          run shell command\n"
 		"?expr         calculate numeric expression\n"
 		"q             quit\n");
+	return 1;
 }
 
-static void cmd_resize(char *arg) {
+static int cmd_resize(char *arg) {
 	ut8 *buf;
 	ut64 tail, n;
 	int i, len, ret = 0;
@@ -192,11 +216,11 @@ static void cmd_resize(char *arg) {
 	default:
 		ret = io_truncate(str2ut64(arg));
 	}
-	if(ret<0)
-		perror("truncate");
+	if(ret<0) perror("truncate");
+	return 1;
 }
 
-static void cmd_system(char *arg) {
+static int cmd_system(char *arg) {
 	int len = bsize;
 	char str[1024];
 	ut8 *buf;
@@ -223,4 +247,5 @@ static void cmd_system(char *arg) {
 	if(io_system(arg)<0)
 		perror("system");
 	unlink(".curblk");
+	return 1;
 }

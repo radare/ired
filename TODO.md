@@ -4,3 +4,10 @@
 * Find a way to return original value if str2ut64 fails (2nd arg..)
 * Add math support to '?' command
 * w<- should write from stdin
+
+Commands can:
+
+ -1 - fail
+  0 - quit
+  1 - run fine
+  2 - run with issues

@@ -24,7 +24,7 @@ static void red_slurpin() {
 	}
 }
 
-static void red_interpret(char *file) {
+static int red_interpret(char *file) {
 	char buf[BUFSZ];
 	FILE *fd = fopen(file, "r");
 	if(fd != NULL) {
@@ -36,6 +36,7 @@ static void red_interpret(char *file) {
 		fclose(fd);
 	} else if (file)
 		fprintf(stderr, "Cannot open script file '%s'\n", file);
+	return 1;
 }
 
 static int red_cmd(char *cmd) {
@@ -44,19 +45,19 @@ static int red_cmd(char *cmd) {
 	switch(*cmd) {
 	case 'q': return 0;
 	case ';': case '#': break; // comment
-	case '>': cmd_dump(arg); break;
-	case '<': cmd_load(arg); break;
-	case '.': red_interpret(arg); break;
-	case 's': cmd_seek(arg); break;
-	case 'b': cmd_bsize(arg); break;
-	case '/': cmd_search(arg); break;
-	case 'p': cmd_print(arg); break;
-	case 'r': cmd_resize(arg); break;
-	case 'x': cmd_hexdump(arg); break;
-	case 'X': cmd_bytedump(arg); break;
-	case 'w': cmd_write(arg); break;
-	case '!': cmd_system(arg); break;
-	case '?': cmd_help(arg); break;
+	case '>': return cmd_dump(arg); break;
+	case '<': return cmd_load(arg); break;
+	case '.': return red_interpret(arg); break;
+	case 's': return cmd_seek(arg); break;
+	case 'b': return cmd_bsize(arg); break;
+	case '/': return cmd_search(arg); break;
+	case 'p': return cmd_print(arg); break;
+	case 'r': return cmd_resize(arg); break;
+	case 'x': return cmd_hexdump(arg); break;
+	case 'X': return cmd_bytedump(arg); break;
+	case 'w': return cmd_write(arg); break;
+	case '!': return cmd_system(arg); break;
+	case '?': return cmd_help(arg); break;
 	default: fprintf(stderr, "? %s\n", cmd);
 	}
 	return 1;
@@ -97,14 +98,14 @@ static int red_open(char *file) {
 		setenv("FILE", file, 1);
 		if(script)
 			red_interpret(script);
-		while(red_prompt()) {
+		while((ret=red_prompt())>0) {
 			curseek = oldseek;
 			bsize = obsize;
 		}
 		io_close();
 	} else if (file)
 		fprintf(stderr, "Cannot open '%s'\n", file);
-	return ret==-1 ?1:0;;
+	return ret==-1 ?1:0;
 }
 
 static int red_help() {
@@ -124,7 +125,10 @@ int main(int argc, char **argv) {
 			case 'v': puts("ired "VERSION); ret = 0; break;
 			case 'h': ret = red_help(); break;
 			case 0x0: red_slurpin(); ret = 0; break;
-		} else ret = red_open(argv[i]);
+		} else {
+			if (!argv[i]) break;
+			ret = red_open(argv[i]);
+		}
 	} else ret = red_help();
         return ret;
 }

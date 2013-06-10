@@ -1,6 +1,8 @@
 CC?=gcc
+VERSION=0.5
 CCw32?=i486-mingw32-gcc
 CFLAGS+=-O2 -Wall
+CFLAGS+=-DVERSION=\"${VERSION}\"
 PREFIX?=/usr/local
 DESTDIR?=
 
@@ -16,8 +18,8 @@ ired: ired.o
 
 dist:
 	@if [ -z "${VERSION}" ]; then echo "Try: make dist VERSION=0.5" ; exit 1 ; fi
-	hg clone . ired-${VERSION}
-	rm -rf ired-${VERSION}/.hg
+	git clone . ired-${VERSION}
+	rm -rf ired-${VERSION}/.git
 	tar czvf ired-${VERSION}.tar.gz ired-${VERSION}
 	rm -rf ired-${VERSION}
 

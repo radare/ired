@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define SKIPSPACES(x) for(;*(x)==' '||*(x)=='\t';x++);
+#define SKIPSPACES(x) for(;*(x)==' '||*(x)=='\t';x++) {};
 
 #if(plan9)
 static int setenv(char *var, char *val, int force) {

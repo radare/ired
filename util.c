@@ -7,11 +7,8 @@ static inline void hexdump(const ut8 *buf, unsigned int len, int w) {
 	for(i=0;i<len;i+=w) {
 		printf("0x%08"LLF"x: ", curseek+i);
 		for(j=i;j<i+w;j++) {
-			if(j>=len) {
-				printf(j%2?"   ":"  ");
-				continue;
-			}
-			printf(j%2?"%02x ":"%02x", buf[j]);
+			if(j<len) printf(j%2?"%02x ":"%02x", buf[j]);
+			else printf(j%2?"   ":"  ");
 		}
 		printf(" ");
 		for(j=i;j<i+w;j++)

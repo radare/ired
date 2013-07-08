@@ -4,7 +4,8 @@
 #define ut8 unsigned char
 
 static int verbose = 1;
-static char *script = 0;
+static int scriptn = 0;
+static const char **scripts = 0;
 static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
@@ -24,7 +25,7 @@ static void red_slurpin() {
 	}
 }
 
-static int red_interpret(char *file) {
+static int red_interpret(const char *file) {
 	char buf[BUFSZ];
 	FILE *fd = fopen(file, "r");
 	if(fd != NULL) {
@@ -51,12 +52,14 @@ static int red_cmd(char *cmd) {
 	case 's': return cmd_seek(arg); break;
 	case 'b': return cmd_bsize(arg); break;
 	case '/': return cmd_search(arg); break;
+	case 'd': return cmd_system ("echo X | ired -n $BLOCK | rasm2 -o $OFFSET -D - |head -n $(($LINES-1))");
 	case 'p': return cmd_print(arg); break;
 	case 'r': return cmd_resize(arg); break;
 	case 'x': return cmd_hexdump(arg); break;
 	case 'X': return cmd_bytedump(arg); break;
 	case 'w': return cmd_write(arg); break;
 	case '!': return cmd_system(arg); break;
+	case 'V': return cmd_system("vired $FILE"); break;
 	case '?': return cmd_help(arg); break;
 	default: fprintf(stderr, "? %s\n", cmd);
 	}
@@ -96,8 +99,9 @@ static int red_open(char *file) {
 	if(ret != -1) {
 		oldseek = 0;
 		setenv("FILE", file, 1);
-		if(script)
-			red_interpret(script);
+		if(scripts)
+			for (ret=0;ret<scriptn;ret++)
+				red_interpret(scripts[ret]);
 		while((ret=red_prompt())>0) {
 			curseek = oldseek;
 			bsize = obsize;
@@ -109,20 +113,22 @@ static int red_open(char *file) {
 }
 
 static int red_help() {
-	puts("ired [-hnv] [-i script] [file] [..]");
+	puts("ired [-hnv] [-i script] [file] [file..]");
 	return 0;
 }
 
 int main(int argc, char **argv) {
 	int i, ret = 1;
 	argc++;
+	scriptn = 0;
+	scripts = malloc(sizeof(const char*)*argc);
 	if(argc>1 && argv[1])
 	for(i=1; i<argc; i++) {
 		if(argv[i] && argv[i][0]=='-')
 			switch(argv[i][1]) {
-			case 'i': script = argv[++i]; break;
+			case 'i': scripts[scriptn++] = argv[++i]; break;
 			case 'n': verbose = 0; break;
-			case 'v': puts("ired "VERSION); ret = 0; break;
+			case 'v': puts(VERSION); ret = 0; break;
 			case 'h': ret = red_help(); break;
 			case 0x0: red_slurpin(); ret = 0; break;
 		} else {
@@ -130,5 +136,6 @@ int main(int argc, char **argv) {
 			ret = red_open(argv[i]);
 		}
 	} else ret = red_help();
+	free(scripts);
         return ret;
 }

@@ -164,6 +164,7 @@ static int cmd_help(char *arg) {
 		"x[size]       hexdump\n"
 		"X[size]       hexpair dump\n"
 		"p[fmt]        print formatted current block ('p' for help)\n"
+		"d[size]       disasemble\n"
 		"r[+-[num]]    truncate or -remove N bytes\n"
 		".[file]       interpret file\n"
 		"<[file]       load file in current seek\n"
@@ -227,12 +228,15 @@ static int cmd_system(char *arg) {
 		if(fd) {
 			if((buf = getcurblk("", &len))) {
 				setenv("BLOCK", ".curblk", 1);
-				if(fwrite(buf, len, 1, fd)<len)
-					perror("fwrite");
+				fwrite(buf, len, 1, fd);
 				free(buf);
 			}
 			fclose(fd);
 		}
+	}
+	if(strstr(arg, "BSIZE")) {
+		sprintf(str, "%d", len);
+		setenv("BSIZE", str, 1);
 	}
 	if(strstr(arg, "OFFSET")) {
 		sprintf(str, "%"LLF"d", curseek);

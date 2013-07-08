@@ -1,8 +1,8 @@
 CC?=gcc
-VERSION=0.5
+VERSION=0.6git
 CCw32?=i486-mingw32-gcc
 CFLAGS+=-O2 -Wall
-CFLAGS+=-DVERSION=\"${VERSION}\"
+#CFLAGS+=-DVERSION=\"${VERSION}\"
 PREFIX?=/usr/local
 DESTDIR?=
 

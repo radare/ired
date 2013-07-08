@@ -154,7 +154,7 @@ static int cmd_write(const char *arg) {
 
 static int cmd_help(char *arg) {
 	if(*arg) {
-		ut64 ret = str2ut64(arg);
+		ut64 ret = r_num_calc (NULL, arg, NULL);
 		printf("0x%"LLF"x %"LLF"d 0%"LLF"o\n", ret, ret, ret);
 	} else printf(
 		"s[+-addr]     seek to relative or absolute address\n"

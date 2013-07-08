@@ -13,6 +13,7 @@ static int red_cmd(char *cmd); // XXX : recursive depenency
 
 #include "ired.h"
 #include "util.c"
+#include "calc.c"
 #include "cmd.c"
 
 static void red_slurpin() {

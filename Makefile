@@ -13,6 +13,9 @@ bdiff: bdiff.o
 
 ired.o: calc.c cmd.c io.c util.c hexparse.c
 
+ired.js:
+	emcc -o ired.js ired.c
+
 ired: ired.o
 	${CC} ${CFLAGS} ired.o -o ired
 

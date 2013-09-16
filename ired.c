@@ -3,9 +3,12 @@
 #define ut64 unsigned long long 
 #define ut8 unsigned char
 
+static int earlyquit = 0;
 static int verbose = 1;
 static int scriptn = 0;
 static const char **scripts = 0;
+static int cmdn = 0;
+static char **cmds = 0;
 static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
@@ -103,6 +106,11 @@ static int red_open(char *file) {
 		if(scripts)
 			for (ret=0;ret<scriptn;ret++)
 				red_interpret(scripts[ret]);
+		if(cmds)
+			for (ret=0;ret<cmdn;ret++)
+				red_cmd(cmds[ret]);
+		if(earlyquit)
+			return 0;
 		while((ret=red_prompt())>0) {
 			curseek = oldseek;
 			bsize = obsize;
@@ -114,20 +122,24 @@ static int red_open(char *file) {
 }
 
 static int red_help() {
-	puts("ired [-hnv] [-i script] [file] [file..]");
+	puts("ired [-qhnv] [-c cmd] [-i script] [-|file ..]");
 	return 0;
 }
 
 int main(int argc, char **argv) {
 	int i, ret = 1;
 	argc++;
+	cmdn = 0;
 	scriptn = 0;
 	scripts = malloc(sizeof(const char*)*argc);
+	cmds = malloc(sizeof(const char*)*argc);
 	if(argc>1 && argv[1])
 	for(i=1; i<argc; i++) {
 		if(argv[i] && argv[i][0]=='-')
 			switch(argv[i][1]) {
+			case 'q': earlyquit = 1; break;
 			case 'i': scripts[scriptn++] = argv[++i]; break;
+			case 'c': cmds[cmdn++] = argv[++i]; break;
 			case 'n': verbose = 0; break;
 			case 'v': puts(VERSION); ret = 0; break;
 			case 'h': ret = red_help(); break;

@@ -1,4 +1,4 @@
-#define VERSION "0.6git"
+#define VERSION "0.6"
 
 #include <unistd.h>
 #include <sys/types.h>

@@ -32,6 +32,12 @@ dist:
 ios:
 	$(MAKE) CC="xcrun --sdk iphoneos gcc -arch arm64 -DHAVE_SYSTEM=0"
 
+ios16:
+	$(MAKE) CC="xcrun --sdk iphoneos gcc -arch armv7 -mno-thumb -DHAVE_SYSTEM=0"
+
+ios32:
+	$(MAKE) CC="xcrun --sdk iphoneos gcc -arch armv7 -DHAVE_SYSTEM=0"
+
 w32:
 	${CCw32} ${CFLAGS} ired.c -o ired.exe
 

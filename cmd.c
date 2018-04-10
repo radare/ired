@@ -1,4 +1,8 @@
-/* Copyleft 2009-2013 -- pancake /at/ nopcode /dot/ org */
+/* Copyleft 2009-2018 -- pancake /at/ nopcode /dot/ org */
+
+#ifndef HAVE_SYSTEM
+#define HAVE_SYSTEM 1
+#endif
 
 static int cmd_hexdump(char *arg) {
 	int len = bsize;
@@ -246,8 +250,10 @@ static int cmd_system(char *arg) {
 		sprintf(str, "0x%"LLF"x", curseek);
 		setenv("XOFFSET", str, 1);
 	}
+#if HAVE_SYSTEM
 	if(io_system(arg)<0)
 		perror("system");
+#endif
 	unlink(".curblk");
 	return 1;
 }

@@ -29,6 +29,9 @@ dist:
 	tar czvf ired-${VERSION}.tar.gz ired-${VERSION}
 	rm -rf ired-${VERSION}
 
+ios:
+	$(MAKE) CC="xcrun --sdk iphoneos gcc -arch arm64 -DHAVE_SYSTEM=0"
+
 w32:
 	${CCw32} ${CFLAGS} ired.c -o ired.exe
 

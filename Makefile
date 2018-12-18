@@ -14,7 +14,10 @@ bdiff: bdiff.o
 ired.o: calc.c cmd.c io.c util.c hexparse.c
 
 ired.js:
-	emcc -o ired.js ired.c
+	emcc -Os -o ired.js ired.c
+
+ired.wasm:
+	emcc -Os -o ired.html ired.c
 
 ired.bc:
 	clang -emit-llvm -o ired.bc -c ired.c

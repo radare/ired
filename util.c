@@ -1,4 +1,4 @@
-/* ired - Copyleft 2009-2013 -- pancake */
+/* ired - MIT - Copyleft 2009-2019 -- pancake */
 
 #include <ctype.h>
 

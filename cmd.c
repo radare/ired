@@ -1,4 +1,4 @@
-/* Copyleft 2009-2018 -- pancake /at/ nopcode /dot/ org */
+/* cmd.c - MIT - Copyright 2009-2019 -- pancake /at/ nopcode /dot/ org */
 
 #ifndef HAVE_SYSTEM
 #define HAVE_SYSTEM 1

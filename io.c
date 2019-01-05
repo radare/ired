@@ -1,4 +1,4 @@
-/* Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
+/* io.c - MIT - Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
 
 #define DEMO 0
 #if DEMO

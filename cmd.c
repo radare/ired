@@ -148,7 +148,7 @@ static int cmd_write(const char *arg) {
 		return 2;
 	}
 	io_seek(curseek, SEEK_SET);
-	if(len<1 || io_write(barg, len)<len) {
+	if(io_write(barg, len)<len) {
 		perror("io_write");
 		return -1;
 	}

@@ -90,7 +90,7 @@ static int equatelines(struct line *a, int an, struct line *b, int bn) {
 
 	/* try to allocate a large hash table to avoid collisions */
 	for(scale = 4; scale; scale /= 2) {
-		h = (struct pos *)malloc(scale * buckets * sizeof(struct pos));
+		h = (struct pos *)calloc(buckets, scale * sizeof(struct pos));
 		if(h)
 			break;
 	}

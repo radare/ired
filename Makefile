@@ -44,6 +44,9 @@ ios32:
 w32:
 	${CCw32} ${CFLAGS} ired.c -o ired.exe
 
+v850:
+	./v850.sh
+
 loc:
 	@wc -l *.c *.h | grep total
 

@@ -19,7 +19,7 @@ static int io_seek (int x,int y) {
 }
 #define io_close() printf("close: TODO\n")
 #define io_system(x) system(x)
-#define io_truncate(x) printf("truncate: TODO\n");
+//#define io_truncate(x) printf("truncate: TODO\n");
 #else
 #if __WIN32__
 
@@ -61,7 +61,7 @@ static inline int io_open(char *file) {
 #define io_seek(x,y) lseek(_fd, x, y)
 #define io_close() close(_fd)
 #define io_system(x) system(x)
-#define io_truncate(x) ftruncate(_fd, (unsigned long)x)
+//#define io_truncate(x) ftruncate(_fd, (unsigned long)x)
 
 #endif
 #endif

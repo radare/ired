@@ -1,4 +1,8 @@
-/* io.c - MIT - Copyleft 2009 -- pancake /at/ nopcode /dot/ org */
+/* io.c - MIT - Copyleft 2009-2020 -- pancake */
+
+#ifndef HAVE_FTRUNCATE
+#define HAVE_FTRUNCATE 1
+#endif
 
 #define DEMO 0
 #if DEMO
@@ -19,7 +23,7 @@ static int io_seek (int x,int y) {
 }
 #define io_close() printf("close: TODO\n")
 #define io_system(x) system(x)
-//#define io_truncate(x) printf("truncate: TODO\n");
+#define io_truncate(x) printf("truncate: TODO\n");
 #else
 #if __WIN32__
 
@@ -61,7 +65,11 @@ static inline int io_open(char *file) {
 #define io_seek(x,y) lseek(_fd, x, y)
 #define io_close() close(_fd)
 #define io_system(x) system(x)
-//#define io_truncate(x) ftruncate(_fd, (unsigned long)x)
+#if HAVE_FTRUNCATE
+#define io_truncate(x) ftruncate(_fd, (off_t)x)
+#else
+#define io_truncate(x) printf("truncate: TODO\n");
+#endif
 
 #endif
 #endif

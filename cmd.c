@@ -213,13 +213,11 @@ static int cmd_resize(char *arg) {
 			}
 			free(buf);
 			if((ret = io_seek(0, SEEK_END))>n)
-				//ret = io_truncate(ret-n);
-				ret = 0;
+				ret = io_truncate(ret-n);
 		} else perror("malloc");
 		break;
 	default:
-		//ret = io_truncate(str2ut64(arg));
-		ret = 0;
+		ret = io_truncate(str2ut64(arg));
 	}
 	if(ret<0) perror("truncate");
 	return 1;

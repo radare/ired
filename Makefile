@@ -16,6 +16,12 @@ ired.o: calc.c cmd.c io.c util.c hexparse.c
 ired.js:
 	emcc -Os -o ired.js ired.c
 
+ired.arm:
+	$(CC) -DUSE_DISASM_ARM=1 ired.c -o ired.arm
+
+ired.x86:
+	$(CC) -DUSE_DISASM_X86=1 ired.c -o ired.x86
+
 ired.wasm:
 	emcc -Os -o ired.html ired.c
 
@@ -52,6 +58,7 @@ loc:
 
 clean:
 	rm -f ired ired.o bdiff bdiff.o
+	rm -f ired.x86 ired.arm ired.wasm ired.js
 
 install:
 	mkdir -p ${DESTDIR}${PREFIX}/bin

@@ -1,8 +1,19 @@
-/* cmd.c - MIT - Copyright 2009-2019 -- pancake /at/ nopcode /dot/ org */
+/* cmd.c - MIT - Copyright 2009-2021 -- pancake /at/ nopcode /dot/ org */
 
 #ifndef HAVE_SYSTEM
 #define HAVE_SYSTEM 1
 #endif
+
+#if USE_DISASM_X86
+#define USE_DISASM 1
+#include "dis/x86.c"
+#elif USE_DISASM_ARM
+#define USE_DISASM 1
+#include "dis/arm.c"
+#else
+#define USE_DISASM 0
+#endif
+
 
 static int cmd_hexdump(char *arg) {
 	int len = bsize;
@@ -29,6 +40,34 @@ static int cmd_print(char *arg) {
 		"s/S          short int16 (lil, big)\n"
 		"z/Z          zero-terminatted string (ascii, wide-ascii)\n"
 		"./:/*        skip 1 or 4 chars, repeat last format instead of cycle\n");
+	return 1;
+}
+
+static int cmd_disasm(const char *arg) {
+	int i, j, len = bsize;
+	ut8 *buf = getcurblk(arg, &len);
+	if(!buf) return 2;
+	
+	char output[256];
+	for(i=0;i<len;i++) {
+		*output = 0;
+		int ilen = disasm(buf + i, len - i, i, output);
+		int pad = 8;
+		printf("0x%08x ", i);
+		if (ilen > 0) {
+			pad = 8 - ilen;
+			for(j=i;j<i+ilen;j++)
+				printf("%02x", buf[j]);
+			i += ilen - 1;
+			if (pad > 0) 
+				for (j = i; j< i+pad;j++)
+					printf("  ");
+		} else {
+			strcpy (output, "invalid");
+		}
+		printf("%s\n", output);
+	}
+	free(buf);
 	return 1;
 }
 
@@ -166,6 +205,7 @@ static int cmd_help(char *arg) {
 		"w[hex|\"str\"]  write hexpair or string\n"
 		"/[hex|\"str\"]  search hexpair or string\n"
 		"x[size]       hexdump\n"
+		"d[size]       disassemble n bytes\n"
 		"X[size]       hexpair dump\n"
 		"p[fmt]        print formatted current block ('p' for help)\n"
 		"d[size]       disasemble\n"

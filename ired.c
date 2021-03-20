@@ -1,4 +1,4 @@
-/* MIT 2009-2013 -- pancake /at/ nopcode /dot/ org */
+/* MIT 2009-2021 -- pancake /at/ nopcode /dot/ org */
 
 #define ut64 unsigned long long 
 #define ut8 unsigned char
@@ -56,7 +56,11 @@ static int red_cmd(char *cmd) {
 	case 's': return cmd_seek(arg); break;
 	case 'b': return cmd_bsize(arg); break;
 	case '/': return cmd_search(arg); break;
-	case 'd': return cmd_system ("echo X | ired -n $BLOCK | rasm2 -o $OFFSET -D - |head -n $(($LINES-1))");
+#if USE_DISASM 
+	case 'd': return cmd_disasm(arg); break;
+#else
+	case 'd': return cmd_system("echo X | ired -n $BLOCK | rasm2 -o $OFFSET -D - |head -n $(($LINES-1))");
+#endif
 	case 'p': return cmd_print(arg); break;
 	case 'r': return cmd_resize(arg); break;
 	case 'x': return cmd_hexdump(arg); break;

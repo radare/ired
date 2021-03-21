@@ -479,11 +479,11 @@ int thumb_disasm(struct thumb_disasm_t *ai) {
 }
 
 unsigned int disasm(const unsigned char *bytes, unsigned int max, int offset, char *output) {
-	struct thumb_disasm_t dis = {
-		.pc = offset,
-		.buf = (const unsigned char*)bytes
-	};
-	int len = thumb_disasm (&dis);
+	int len;
+	struct thumb_disasm_t dis;
+	dis.pc = offset;
+	dis.buf = bytes;
+	len = thumb_disasm (&dis);
 	if (len > 0) {
 		strcpy (output, dis.str);
 	}

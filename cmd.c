@@ -7,6 +7,12 @@
 #if USE_DISASM_X86
 #define USE_DISASM 1
 #include "dis/x86.c"
+#elif USE_DISASM_X32
+#define USE_DISASM 1
+#include "dis/x32.c"
+#elif USE_DISASM_8086
+#define USE_DISASM 1
+#include "dis/8086.c"
 #elif USE_DISASM_ARM
 #define USE_DISASM 1
 #include "dis/arm.c"
@@ -43,33 +49,38 @@ static int cmd_print(char *arg) {
 	return 1;
 }
 
+#if USE_DISASM
 static int cmd_disasm(const char *arg) {
-	int i, j, len = bsize;
-	ut8 *buf = getcurblk(arg, &len);
-	if(!buf) return 2;
-	
 	char output[256];
-	for(i=0;i<len;i++) {
+	int i, j, len = bsize, ilen;
+	int pad = 8;
+	ut8 *buf = getcurblk(arg, &len);
+	if (!buf) {
+		return 2;
+	}
+	
+	for(i = 0; i < len ;i++) {
 		*output = 0;
-		int ilen = disasm(buf + i, len - i, i, output);
-		int pad = 8;
-		printf("0x%08x ", i);
+		ilen = disasm(buf + i, len - i, curseek+i, output);
+		printf("0x%08llx ", curseek+i);
+		pad = 10;
 		if (ilen > 0) {
-			pad = 8 - ilen;
-			for(j=i;j<i+ilen;j++)
+			pad -= ilen;
+			for(j=i;j < i+ilen && j < len;j++)
 				printf("%02x", buf[j]);
 			i += ilen - 1;
 			if (pad > 0) 
 				for (j = i; j< i+pad;j++)
 					printf("  ");
 		} else {
-			strcpy (output, "invalid");
+			strcpy(output, "invalid");
 		}
 		printf("%s\n", output);
 	}
 	free(buf);
 	return 1;
 }
+#endif
 
 static int cmd_bytedump(const char *arg) {
 	int i, len = bsize;

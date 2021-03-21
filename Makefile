@@ -19,8 +19,15 @@ ired.js:
 ired.arm:
 	$(CC) -DUSE_DISASM_ARM=1 ired.c -o ired.arm
 
+ired.8086:
+	$(CC) -fsanitize=address -g -DUSE_DISASM_8086=1 ired.c -o ired.8086
+
 ired.x86:
-	$(CC) -DUSE_DISASM_X86=1 ired.c -o ired.x86
+	$(CC) -fsanitize=address -g -DUSE_DISASM_X32=1 ired.c -o ired.x86
+	# $(CC) -fsanitize=address -g -DUSE_DISASM_X86=1 ired.c -o ired.x86
+
+ired.com: # msdos
+	owcc -DUSE_DISASM_X32=1 ired.c -o ired.exe
 
 ired.wasm:
 	emcc -Os -o ired.html ired.c

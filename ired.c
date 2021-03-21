@@ -12,7 +12,12 @@ static char **cmds = 0;
 static ut64 oldseek, curseek = 0LL;
 static int obsize, bsize = 256;
 static int red_cmd(char *cmd); // XXX : recursive depenency
+#if defined(__WATCOMC__)
+#define HAVE_FTRUNCATE 0
+#define BUFSZ 1024
+#else
 #define BUFSZ 128*1024
+#endif
 
 #include "ired.h"
 #include "util.c"
